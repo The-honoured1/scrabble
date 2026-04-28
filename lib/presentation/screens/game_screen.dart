@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:scrabble/services/dictionary_service.dart';
 import 'package:scrabble/controllers/game_controller.dart';
 import 'package:scrabble/models/tile_model.dart';
+import 'package:scrabble/models/board_model.dart';
 import 'package:scrabble/models/game_mode.dart';
 
 class GameScreen extends StatefulWidget {

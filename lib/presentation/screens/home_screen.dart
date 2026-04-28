@@ -12,6 +12,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:scrabble/presentation/screens/stats_screen.dart';
 import 'package:scrabble/presentation/screens/history_screen.dart';
 import 'package:scrabble/presentation/screens/settings_screen.dart';
+import 'package:scrabble/services/stats_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,6 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final s = await StatsService.getStats();
     if (mounted) setState(() => _streak = s['currentStreak'] ?? 0);
   }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
@@ -130,14 +134,16 @@ class _ParallaxBackground extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-            center: Alignment.center,
-            radius: 1.5,
-            colors: [
-              AppColors.surface.withOpacity(0.5),
-              AppColors.background,
-            ],
+                center: Alignment.center,
+                radius: 1.5,
+                colors: [
+                  AppColors.surface.withOpacity(0.5),
+                  AppColors.background,
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

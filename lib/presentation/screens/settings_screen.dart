@@ -5,6 +5,7 @@ import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:scrabble/presentation/screens/asset_management_screen.dart';
+import 'package:scrabble/services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -59,9 +60,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const _SettingsGroup(
                   title: 'GAMEPLAY',
                   children: [
-                    _SettingsToggle(label: 'HAPTIC FEEDBACK', initialValue: true),
-                    _SettingsToggle(label: 'SOUND EFFECTS', initialValue: true),
-                    _SettingsToggle(label: 'TILE MAGNETISM', initialValue: false),
+                    _SettingsToggle(label: 'HAPTIC FEEDBACK', settingsKey: 'haptic'),
+                    _SettingsToggle(label: 'SOUND EFFECTS', settingsKey: 'sound'),
+                    _SettingsToggle(label: 'TILE MAGNETISM', settingsKey: 'magnet'),
                   ],
                 ),
 
@@ -77,8 +78,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                       },
                     ),
-                    const _SettingsToggle(label: 'HIGH CONTRAST', initialValue: false),
-                    const _SettingsToggle(label: 'DARK MODE', initialValue: true),
+                    const _SettingsToggle(label: 'HIGH CONTRAST', settingsKey: 'contrast'),
+                    const _SettingsToggle(label: 'DARK MODE', settingsKey: 'dark_mode'),
                   ],
                 ),
 
@@ -155,9 +156,9 @@ class _SettingsGroup extends StatelessWidget {
 
 class _SettingsToggle extends StatefulWidget {
   final String label;
-  final bool initialValue;
+  final String settingsKey; // Added to distinguish settings
 
-  const _SettingsToggle({required this.label, required this.initialValue});
+  const _SettingsToggle({required this.label, required this.settingsKey});
 
   @override
   State<_SettingsToggle> createState() => _SettingsToggleState();
@@ -170,7 +171,8 @@ class _SettingsToggleState extends State<_SettingsToggle> with SingleTickerProvi
   @override
   void initState() {
     super.initState();
-    _value = widget.initialValue;
+    _value = true; // Placeholder until load
+    _loadValue();
     _burstController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -183,8 +185,20 @@ class _SettingsToggleState extends State<_SettingsToggle> with SingleTickerProvi
     super.dispose();
   }
 
-  void _toggle(bool? val) {
-    setState(() => _value = val ?? !_value);
+  Future<void> _loadValue() async {
+    bool val = false;
+    if (widget.settingsKey == 'haptic') val = await SettingsService.isHapticEnabled();
+    if (widget.settingsKey == 'sound') val = await SettingsService.isSoundEnabled();
+    if (mounted) setState(() => _value = val);
+  }
+
+  void _toggle(bool? val) async {
+    final newValue = val ?? !_value;
+    setState(() => _value = newValue);
+    
+    if (widget.settingsKey == 'haptic') await SettingsService.setHaptic(newValue);
+    if (widget.settingsKey == 'sound') await SettingsService.setSound(newValue);
+
     if (_value) {
       _burstController.forward(from: 0);
       HapticService.light();

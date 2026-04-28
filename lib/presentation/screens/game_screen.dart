@@ -72,27 +72,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _onCommit() async {
-    HapticService.medium();
-    
-    // In a real game, logic would extract the word from placed tiles
-    const String simulatedWord = 'SCRABBLE';
-    final isValid = DictionaryService().isValidWord(simulatedWord);
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    
-    if (isValid) {
-      _confettiController.play();
-      HapticService.success();
-      setState(() {
-        _playerScore += 88;
-        _moveCount++;
-      });
-    } else {
-      _shakeController.forward(from: 0);
-      HapticService.heavy();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +316,6 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
         );
       }).toList();
     }
-  }
 }
 
 class _PremiumSquare extends StatefulWidget {
@@ -447,53 +425,6 @@ class _BoardCell extends StatelessWidget {
   }
 }
 
-class _AnimatedPlacedTile extends StatelessWidget {
-  final PlacedTile tile;
-  final AnimationController boardController;
-  final double cellSize;
-
-  const _AnimatedPlacedTile({
-    required this.tile,
-    required this.boardController,
-    required this.cellSize,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final random = Random();
-    final startX = (random.nextDouble() * 2 - 1) * 300;
-    final startY = (random.nextDouble() * 2 - 1) * 300;
-
-    return AnimatedBuilder(
-      animation: boardController,
-      builder: (context, child) {
-        final t = CurvedAnimation(
-          parent: boardController,
-          curve: Interval(
-            (tile.x + tile.y) / 30,
-            1.0,
-            curve: Curves.elasticOut,
-          ),
-        ).value;
-
-        final currentX = startX + (tile.x * (cellSize + 2) - startX) * t;
-        final currentY = startY + (tile.y * (cellSize + 2) - startY) * t;
-
-        return Positioned(
-          left: currentX,
-          top: currentY,
-          child: Opacity(
-            opacity: t.clamp(0.0, 1.0),
-            child: _TileWidget(
-              letter: tile.letter,
-              size: cellSize,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
 
 class _TileWidget extends StatelessWidget {
   final ScrabbleTile tile;
@@ -663,10 +594,3 @@ class _DraggableTileState extends State<_DraggableTile> {
   }
 }
 
-class PlacedTile {
-  final String letter;
-  final int x;
-  final int y;
-
-  PlacedTile({required this.letter, required this.x, required this.y});
-}

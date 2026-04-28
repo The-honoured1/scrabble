@@ -102,9 +102,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: InteractiveViewer(
-                        boundaryMargin: const EdgeInsets.all(100),
+                        boundaryMargin: const EdgeInsets.all(400),
                         minScale: 0.5,
                         maxScale: 2.5,
+                        transformationController: TransformationController(
+                          Matrix4.identity()
+                            ..translate(-150.0, -150.0)
+                            ..scale(1.8),
+                        ),
                         child: _ScrabbleBoard(
                           controller: _boardController,
                           gameController: _gameController,
@@ -280,16 +285,17 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
                         final y = index ~/ 15;
                         final square = widget.gameController.state.board[y][x];
                         
+                        // Check for pending tile
+                        final pending = widget.gameController.pendingPlacements.where((p) => p.x == x && p.y == y);
+                        final ScrabbleTile? tile = pending.isNotEmpty ? pending.first.tile : square.tile;
+
                         return _BoardCell(
                           square: square,
+                          tile: tile,
                           onTileDropped: (tile) => widget.gameController.placeTile(tile, x, y),
                         );
                       },
                     ),
-                    // Render permanent tiles
-                    ..._buildPlacedTiles(size),
-                    // Render pending tiles
-                    ..._buildPendingTiles(size),
                   ],
                 ),
             ),
@@ -307,37 +313,9 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
           },
         ),
       );
-    }
-
-    List<Widget> _buildPlacedTiles(double size) {
-      final cellSize = (size - 8) / 15;
-      List<Widget> tiles = [];
-      for (int y = 0; y < 15; y++) {
-        for (int x = 0; x < 15; x++) {
-          final tile = widget.gameController.state.board[y][x].tile;
-          if (tile != null) {
-            tiles.add(Positioned(
-              left: x * (cellSize + 2),
-              top: y * (cellSize + 2),
-              child: _TileWidget(tile: tile, size: cellSize),
-            ));
-          }
-        }
-      }
-      return tiles;
-    }
-
-    List<Widget> _buildPendingTiles(double size) {
-      final cellSize = (size - 8) / 15;
-      return widget.gameController.pendingPlacements.map((p) {
-        return Positioned(
-          left: p.x * (cellSize + 2),
-          top: p.y * (cellSize + 2),
-          child: _TileWidget(tile: p.tile, size: cellSize),
-        );
-      }).toList();
-    }
+  }
 }
+
 
 class _PremiumSquare extends StatefulWidget {
   const _PremiumSquare();
@@ -392,9 +370,10 @@ class _PremiumSquareState extends State<_PremiumSquare> with SingleTickerProvide
 
 class _BoardCell extends StatelessWidget {
   final BoardSquare square;
+  final ScrabbleTile? tile;
   final Function(ScrabbleTile) onTileDropped;
 
-  const _BoardCell({required this.square, required this.onTileDropped});
+  const _BoardCell({required this.square, this.tile, required this.onTileDropped});
 
   @override
   Widget build(BuildContext context) {
@@ -408,10 +387,11 @@ class _BoardCell extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: isPremium ? color : Colors.black.withOpacity(0.02),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(2),
             border: Border.all(color: Colors.black.withOpacity(0.03), width: 0.5),
           ),
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               if (isPremium) Center(
                 child: Text(
@@ -426,7 +406,13 @@ class _BoardCell extends StatelessWidget {
               if (candidateData.isNotEmpty) Container(
                 decoration: BoxDecoration(
                   color: AppColors.accent.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              if (tile != null) LayoutBuilder(
+                builder: (context, constraints) => _TileWidget(
+                  tile: tile!, 
+                  size: constraints.biggest.width,
                 ),
               ),
             ],

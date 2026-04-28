@@ -39,30 +39,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      backgroundColor: Colors.white,
+      body: IndexedStack(
+        index: _selectedIndex,
         children: [
-          // Parallax Background
-          const _ParallaxBackground(),
-
-          IndexedStack(
-            index: _selectedIndex,
-            children: [
-              _HomeContent(streak: _streak),
-              const StatsScreen(),
-              const HistoryScreen(),
-              const SettingsScreen(),
-            ],
-          ),
-
-          // Bottom Nav
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: CustomBottomNav(
-              selectedIndex: _selectedIndex,
-              onItemSelected: (index) => setState(() => _selectedIndex = index),
-            ),
-          ),
+          _HomeContent(streak: _streak),
+          const StatsScreen(),
+          const HistoryScreen(),
+          const SettingsScreen(),
         ],
+      ),
+      bottomNavigationBar: CustomBottomNav(
+        selectedIndex: _selectedIndex,
+        onItemSelected: (index) => setState(() => _selectedIndex = index),
       ),
     );
   }
@@ -81,43 +70,38 @@ class _HomeContent extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: AnimationConfiguration.toStaggeredList(
-              duration: const Duration(milliseconds: 600),
-              childAnimationBuilder: (widget) => FadeInAnimation(
-                child: SlideAnimation(
-                  verticalOffset: 20,
-                  child: widget,
+            children: [
+              const SizedBox(height: 40),
+              const _NytWordmark(),
+              const SizedBox(height: 8),
+              const _TypewriterDate(),
+              const Divider(height: 60, thickness: 1, color: Colors.black12),
+              const _ZenHeading(),
+              const SizedBox(height: 32),
+              const _SubscribeButton(),
+              const Divider(height: 80, thickness: 1, color: Colors.black12),
+              const _EditorialMenu(),
+              const Divider(height: 80, thickness: 1, color: Colors.black12),
+              const Text(
+                'STATISTICS',
+                style: TextStyle(
+                  letterSpacing: 4,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12,
+                  color: AppColors.textBody,
                 ),
               ),
-              children: [
-                const SizedBox(height: 20),
-                const _NytWordmark(),
-                const SizedBox(height: 12),
-                const _TypewriterDate(),
-                const SizedBox(height: 60),
-                const _ZenHeading(),
-                const SizedBox(height: 20),
-                const _SubscribeButton(),
-                const SizedBox(height: 80),
-                
-                // Collage Mosaic
-                const _CollageMosaic(),
-                
-                const SizedBox(height: 80),
-                const Text(
-                  'YOUR STREAK',
-                  style: TextStyle(
-                    letterSpacing: 4,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    color: AppColors.textMuted,
-                  ),
+              const SizedBox(height: 24),
+              Text(
+                '$streak DAY STREAK',
+                style: GoogleFonts.frankRuhlLibre(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.orange,
                 ),
-                const SizedBox(height: 24),
-                StreakDisplay(streak: streak),
-                const SizedBox(height: 120),
-              ],
-            ),
+              ),
+              const SizedBox(height: 40),
+            ],
           ),
         ),
       ),
@@ -186,137 +170,67 @@ class _SubscribeButton extends StatelessWidget {
   }
 }
 
-class _CollageMosaic extends StatelessWidget {
-  const _CollageMosaic();
+class _EditorialMenu extends StatelessWidget {
+  const _EditorialMenu();
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _FloatingShape(
-              color: AppColors.accent,
-              icon: Icons.grid_on_rounded,
-              label: 'PRACTICE',
-              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.practice))),
-            ),
-            _FloatingShape(
-              color: AppColors.secondary,
-              icon: Icons.computer_rounded,
-              label: 'VS CPU',
-              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.vsComputer))),
-            ),
-          ],
+        _MenuTile(
+          title: 'Daily Challenge',
+          subtitle: 'A new board every day.',
+          onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.dailyChallenge))),
         ),
-        const SizedBox(height: 32),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _FloatingShape(
-              color: AppColors.orange,
-              icon: Icons.today_rounded,
-              label: 'DAILY',
-              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.dailyChallenge))),
-            ),
-            _FloatingShape(
-              color: AppColors.green,
-              icon: Icons.emoji_events_rounded,
-              label: 'STREAKS',
-              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const StatsScreen())),
-            ),
-          ],
+        const Divider(color: Colors.black12),
+        _MenuTile(
+          title: 'Versus Computer',
+          subtitle: 'Challenge the AI engine.',
+          onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.vsComputer))),
+        ),
+        const Divider(color: Colors.black12),
+        _MenuTile(
+          title: 'Zen Practice',
+          subtitle: 'Improve your vocabulary.',
+          onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.practice))),
         ),
       ],
     );
   }
 }
 
-class _FloatingShape extends StatelessWidget {
-  final Color color;
-  final IconData icon;
-  final String label;
+class _MenuTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
-  const _FloatingShape({
-    required this.color,
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+  const _MenuTile({required this.title, required this.subtitle, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return SpringyFeedback(
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 8),
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 40),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
+      title: Text(
+        title,
+        style: GoogleFonts.frankRuhlLibre(
+          fontSize: 24,
+          fontWeight: FontWeight.w900,
+          color: AppColors.textBody,
+        ),
       ),
+      subtitle: Text(
+        subtitle,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          color: AppColors.textMuted,
+        ),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textBody),
     );
   }
 }
 
-class _ParallaxBackground extends StatelessWidget {
-  const _ParallaxBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    // In a real app with sensors_plus, we'd use sensor data to offset this.
-    // For now, we'll use a slow subtle animation or just a static grid.
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-      ),
-      child: Stack(
-        children: [
-          CustomPaint(
-            painter: _GridPainter(),
-            size: Size.infinite,
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment.center,
-                radius: 1.5,
-                colors: [
-                  AppColors.surface.withOpacity(0.5),
-                  AppColors.background,
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _GridPainter extends CustomPainter {
   @override
@@ -478,18 +392,10 @@ class CustomBottomNav extends StatelessWidget {
     final labels = ['HOME', 'STATS', 'HISTORY', 'SETTINGS'];
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.black12)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

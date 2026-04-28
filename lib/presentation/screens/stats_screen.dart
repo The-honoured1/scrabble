@@ -4,6 +4,8 @@ import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
+import 'package:scrabble/services/stats_service.dart';
+
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
 
@@ -12,6 +14,18 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> {
+  Map<String, dynamic>? _stats;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final s = await StatsService.getStats();
+    if (mounted) setState(() => _stats = s);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +49,9 @@ class _StatsScreenState extends State<StatsScreen> {
                 const SizedBox(height: 32),
                 
                 // 2x2 Grid
-                const _StatsGrid(),
+                _stats == null 
+                  ? const Center(child: CircularProgressIndicator())
+                  : _StatsGrid(stats: _stats!),
                 const SizedBox(height: 48),
 
                 // Bar Chart
@@ -75,7 +91,8 @@ class _StatsScreenState extends State<StatsScreen> {
 }
 
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid();
+  final Map<String, dynamic> stats;
+  const _StatsGrid({required this.stats});
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +103,11 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
       childAspectRatio: 1.2,
-      children: const [
-        _StatCard(label: 'GAMES PLAYED', value: 42),
-        _StatCard(label: 'WINS', value: 28),
-        _StatCard(label: 'AVG SCORE', value: 342),
-        _StatCard(label: 'BEST WORD', value: 88),
+      children: [
+        _StatCard(label: 'GAMES PLAYED', value: stats['gamesPlayed'] ?? 0),
+        _StatCard(label: 'WINS', value: stats['wins'] ?? 0),
+        _StatCard(label: 'AVG SCORE', value: stats['avgScore'] ?? 0),
+        _StatCard(label: 'BEST WORD', value: stats['bestWord'] ?? 0),
       ],
     );
   }

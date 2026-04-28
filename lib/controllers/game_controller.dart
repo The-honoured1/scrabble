@@ -4,6 +4,8 @@ import '../models/tile_model.dart';
 import '../models/board_model.dart';
 import '../services/dictionary_service.dart';
 import '../services/move_validator.dart';
+import '../services/cpu_engine.dart';
+import '../services/stats_service.dart';
 
 class GameController extends ChangeNotifier {
   late GameState state;
@@ -102,11 +104,46 @@ class GameController extends ChangeNotifier {
   }
 
   void _triggerCpuTurn() async {
+    if (state.isPlayerTurn) return;
+
     await Future.delayed(const Duration(seconds: 2));
-    // CPU logic: pick a word, place it, commit.
-    // For now, let's just make it skip turn so it's playable.
+    
+    final cpuMove = await CpuEngine.findMove(state, _dictionary.words ?? {});
+    
+    if (cpuMove != null) {
+      final words = MoveValidator.findFormedWords(state.board, cpuMove);
+      if (words.isNotEmpty) {
+        int moveScore = _calculateScore(words);
+        
+        for (var p in cpuMove) {
+          state.board[p.y][p.x].tile = p.tile;
+          state.cpuRack.remove(p.tile);
+        }
+        
+        state.cpuScore += moveScore;
+        _refillRack(state.cpuRack);
+      }
+    }
+    
     state.isPlayerTurn = true;
+    state.moveCount++;
     notifyListeners();
+    _checkEndGame();
+  }
+
+  void _checkEndGame() {
+    bool bagEmpty = state.bag.isEmpty;
+    bool playerDone = state.playerRack.isEmpty;
+    bool cpuDone = state.cpuRack.isEmpty;
+
+    if (bagEmpty && (playerDone || cpuDone)) {
+      StatsService.recordGame(
+        score: state.playerScore,
+        won: state.playerScore > state.cpuScore,
+        bestWord: 0, // Would need actual best word tracking
+      );
+      // Navigate to results screen or show overlay
+    }
   }
 }
 

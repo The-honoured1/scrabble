@@ -8,6 +8,7 @@ class DictionaryService {
   Set<String>? _words;
   bool _isLoading = false;
 
+  Set<String>? get words => _words;
   bool get isLoaded => _words != null;
 
   Future<void> loadDictionary() async {

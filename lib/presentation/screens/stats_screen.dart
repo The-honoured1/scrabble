@@ -35,22 +35,29 @@ class _StatsScreenState extends State<StatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: AnimationConfiguration.toStaggeredList(
               duration: const Duration(milliseconds: 600),
-              childAnimationBuilder: (widget) => SlideAnimation(
-                verticalOffset: 50.0,
-                child: FadeInAnimation(child: widget),
+              childAnimationBuilder: (widget) => FadeInAnimation(
+                child: SlideAnimation(
+                  verticalOffset: 30,
+                  child: widget,
+                ),
               ),
               children: [
+                const SizedBox(height: 20),
                 Text(
-                  'STATISTICS',
-                  style: Theme.of(context).textTheme.displayMedium,
+                  'Your Stats',
+                  style: GoogleFonts.frankRuhlLibre(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textBody,
+                  ),
                 ),
                 const SizedBox(height: 32),
                 
@@ -105,57 +112,55 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.2,
-      children: [
-        _StatCard(label: 'GAMES PLAYED', value: stats['gamesPlayed'] ?? 0),
-        _StatCard(label: 'WINS', value: stats['wins'] ?? 0),
-        _StatCard(label: 'AVG SCORE', value: stats['avgScore'] ?? 0),
-        _StatCard(label: 'BEST WORD', value: stats['bestWord'] ?? 0),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        children: [
+          _StatItem(label: 'Games', value: stats['gamesPlayed'].toString()),
+          const Divider(height: 32, color: Colors.black12),
+          _StatItem(label: 'Wins', value: stats['wins'].toString()),
+          const Divider(height: 32, color: Colors.black12),
+          _StatItem(label: 'Avg Score', value: stats['avgScore'].toString()),
+          const Divider(height: 32, color: Colors.black12),
+          _StatItem(label: 'Best Word', value: stats['bestWord'].toString()),
+        ],
+      ),
     );
   }
 }
 
-class _StatCard extends StatelessWidget {
+class _StatItem extends StatelessWidget {
   final String label;
-  final int value;
-
-  const _StatCard({required this.label, required this.value});
+  final String value;
+  const _StatItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return SpringyFeedback(
-      onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textMuted,
+            letterSpacing: 2,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _CountingNumber(value: value),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 10,
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        Text(
+          value,
+          style: GoogleFonts.frankRuhlLibre(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: AppColors.textBody,
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -247,7 +252,7 @@ class _ScoreDistributionChart extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '${values[index]}',
-                style: GoogleFonts.jetBrainsMono(fontSize: 10, color: AppColors.textMuted),
+                style: GoogleFonts.jetBrainsMono(fontSize: 10, color: AppColors.textMuted, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -257,6 +262,24 @@ class _ScoreDistributionChart extends StatelessWidget {
   }
 }
 
+class _GrowBar extends StatelessWidget {
+  final double value;
+  final bool isCurrent;
+  const _GrowBar({required this.value, required this.isCurrent});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 12,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.black12,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: value,
+        child: Container(
 class _GrowBar extends StatefulWidget {
   final double value;
   final bool isCurrent;
@@ -299,7 +322,7 @@ class _GrowBarState extends State<_GrowBar> with SingleTickerProviderStateMixin 
           height: 12,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.05),
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
@@ -307,8 +330,7 @@ class _GrowBarState extends State<_GrowBar> with SingleTickerProviderStateMixin 
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
-                color: widget.isCurrent ? AppColors.primary : AppColors.surface,
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                color: widget.isCurrent ? AppColors.primary : AppColors.accent,
               ),
             ),
           ),
@@ -351,7 +373,7 @@ class _CalendarGrid extends StatelessWidget {
             child: FadeInAnimation(
               child: Container(
                 decoration: BoxDecoration(
-                  color: playedOnDay ? AppColors.primary.withOpacity(0.8) : Colors.white.withOpacity(0.03),
+                  color: playedOnDay ? AppColors.accent : Colors.black.withOpacity(0.03),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),

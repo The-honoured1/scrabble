@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:scrabble/presentation/screens/home_screen.dart';
@@ -70,63 +71,39 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: GestureDetector(
-        onTap: _navigateToHome,
-        child: Stack(
-          children: [
-            // Letterbox Bars (Revealing Home underneath)
-            Center(
-              child: AnimatedBuilder(
-                animation: _logoController,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, _logoAnimation.value),
-                    child: Text(
-                      'SCRABBLE',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                            letterSpacing: 8,
-                            color: AppColors.primary,
-                          ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _logoController,
+          builder: (context, child) {
+            final opacity = (_logoController.value).clamp(0.0, 1.0);
+            return Opacity(
+              opacity: opacity,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'The Scrabble Game',
+                    style: GoogleFonts.frankRuhlLibre(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textBody,
+                      letterSpacing: -1,
                     ),
-                  );
-                },
-              ),
-            ),
-
-            // Top Bar
-            AnimatedBuilder(
-              animation: _barsController,
-              builder: (context, child) {
-                return FractionalTranslation(
-                  translation: Offset(0, _topBarAnimation.value),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height / 2,
-                    width: double.infinity,
-                    color: AppColors.background,
                   ),
-                );
-              },
-            ),
-
-            // Bottom Bar
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: AnimatedBuilder(
-                animation: _barsController,
-                builder: (context, child) {
-                  return FractionalTranslation(
-                    translation: Offset(0, _bottomBarAnimation.value),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height / 2,
-                      width: double.infinity,
-                      color: AppColors.background,
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 60,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.accent,
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

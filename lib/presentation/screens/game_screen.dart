@@ -86,7 +86,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         );
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: Column(
             children: [
@@ -108,7 +108,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       child: ConfettiWidget(
                         confettiController: _confettiController,
                         blastDirectionality: BlastDirectionality.explosive,
-                        colors: const [AppColors.primary, Colors.white, Colors.orange],
+                        colors: const [AppColors.accent, AppColors.secondary, AppColors.orange],
                       ),
                     ),
                   ],
@@ -140,9 +140,10 @@ class _GameHUD extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.white10, width: 1)),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.05), width: 1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,16 +152,21 @@ class _GameHUD extends StatelessWidget {
           Column(
             children: [
               Text(
-                'DAILY CHALLENGE',
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 10,
-                  color: AppColors.textMuted,
-                  letterSpacing: 1.5,
+                'MOVE $moveCount',
+                style: GoogleFonts.frankRuhlLibre(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                  color: AppColors.textBody,
                 ),
               ),
-              Text(
-                'MOVE $moveCount',
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              const SizedBox(height: 2),
+              Container(
+                width: 40,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ],
           ),
@@ -182,25 +188,22 @@ class _HUDScoreItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor: isPlayer ? AppColors.primary : AppColors.surface,
-          child: Text(
-            label[0],
-            style: TextStyle(
-              color: isPlayer ? AppColors.background : Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+        Text(
+          label,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1,
+            color: AppColors.textMuted,
           ),
         ),
         const SizedBox(height: 4),
         AnimatedFlipCounter(
           value: score,
-          textStyle: GoogleFonts.jetBrainsMono(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isPlayer ? AppColors.primary : Colors.white,
+          textStyle: GoogleFonts.frankRuhlLibre(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: isPlayer ? AppColors.accent : AppColors.primary,
           ),
         ),
       ],
@@ -237,14 +240,20 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final size = min(constraints.maxWidth, constraints.maxHeight) - 32;
+          final size = min(constraints.maxWidth, constraints.maxHeight) - 40;
           final board = Container(
             width: size,
             height: size,
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white10),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
             padding: const EdgeInsets.all(4),
             child: Stack(
@@ -388,16 +397,17 @@ class _BoardCell extends StatelessWidget {
         
         return Container(
           decoration: BoxDecoration(
-            color: isPremium ? color.withOpacity(0.2) : Colors.white.withOpacity(0.03),
-            borderRadius: BorderRadius.circular(2),
+            color: isPremium ? color : Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: Colors.black.withOpacity(0.05), width: 0.5),
           ),
           child: isPremium ? Center(
             child: Text(
               _getMultiplierText(),
               style: TextStyle(
-                fontSize: 6,
-                fontWeight: FontWeight.bold,
-                color: color,
+                fontSize: 8,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
               ),
             ),
           ) : null,
@@ -441,12 +451,13 @@ class _TileWidget extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(4),
+        color: isRack ? Colors.white : AppColors.primary,
+        borderRadius: BorderRadius.circular(isRack ? 12 : 4),
+        border: isRack ? Border.all(color: Colors.black12, width: 2) : null,
         boxShadow: isRack ? [
-          const BoxShadow(
-            color: Colors.black26,
-            offset: Offset(0, 4),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: const Offset(0, 4),
             blurRadius: 0,
           )
         ] : null,
@@ -457,19 +468,19 @@ class _TileWidget extends StatelessWidget {
           children: [
             Text(
               tile.letter,
-              style: TextStyle(
-                color: AppColors.background,
+              style: GoogleFonts.frankRuhlLibre(
+                color: isRack ? AppColors.textBody : Colors.white,
                 fontWeight: FontWeight.w900,
-                fontSize: size * 0.55,
+                fontSize: size * 0.6,
               ),
             ),
             Positioned(
-              right: size * 0.1,
-              bottom: size * 0.1,
+              right: size * 0.12,
+              bottom: size * 0.12,
               child: Text(
                 '${tile.points}',
                 style: TextStyle(
-                  color: AppColors.background.withOpacity(0.7),
+                  color: (isRack ? AppColors.textBody : Colors.white).withOpacity(0.5),
                   fontWeight: FontWeight.bold,
                   fontSize: size * 0.22,
                 ),
@@ -498,10 +509,17 @@ class _TileRack extends StatelessWidget {
         CurvedAnimation(parent: controller, curve: Curves.easeOutBack),
       ),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 40,
+              offset: Offset(0, -10),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -529,18 +547,18 @@ class _TileRack extends StatelessWidget {
               onTap: gameController.commitMove,
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 22),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(40),
                 ),
                 child: const Center(
                   child: Text(
-                    'PLAY WORD',
+                    'SUBMIT WORD',
                     style: TextStyle(
-                      color: AppColors.background,
+                      color: Colors.white,
                       fontWeight: FontWeight.w900,
-                      fontSize: 18,
+                      fontSize: 16,
                       letterSpacing: 2,
                     ),
                   ),

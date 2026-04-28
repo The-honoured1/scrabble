@@ -38,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -51,9 +51,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: FadeInAnimation(child: widget),
               ),
               children: [
+                const SizedBox(height: 20),
                 Text(
-                  'SETTINGS',
-                  style: Theme.of(context).textTheme.displayMedium,
+                  'Settings',
+                  style: GoogleFonts.frankRuhlLibre(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textBody,
+                  ),
                 ),
                 const SizedBox(height: 32),
                 
@@ -141,8 +146,7 @@ class _SettingsGroup extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
             children: children,
@@ -223,10 +227,10 @@ class _SettingsToggleState extends State<_SettingsToggle> with SingleTickerProvi
           Switch(
             value: _value,
             onChanged: _toggle,
-            activeColor: AppColors.primary,
-            activeTrackColor: AppColors.primary.withOpacity(0.2),
+            activeColor: AppColors.accent,
+            activeTrackColor: AppColors.accent.withOpacity(0.2),
             inactiveThumbColor: AppColors.textMuted,
-            inactiveTrackColor: Colors.white10,
+            inactiveTrackColor: Colors.black12,
           ),
         ],
       ),

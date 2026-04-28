@@ -18,7 +18,7 @@ class ScrabbleApp extends StatelessWidget {
     return MaterialApp(
       title: 'Scrabble Dynamic',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       home: const SplashScreen(),
     );
   }

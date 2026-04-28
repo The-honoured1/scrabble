@@ -30,16 +30,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: Text(
-                'HISTORY',
-                style: Theme.of(context).textTheme.displayMedium,
+                'Game Log',
+                style: GoogleFonts.frankRuhlLibre(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textBody,
+                ),
               ),
             ),
             Expanded(
@@ -106,11 +110,10 @@ class _HistoryCard extends StatelessWidget {
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,18 +145,18 @@ class _HistoryCard extends StatelessWidget {
             children: [
               Text(
                 '${item.playerScore} - ${item.cpuScore}',
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 18,
+                style: GoogleFonts.frankRuhlLibre(
+                  fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: item.won ? Colors.greenAccent : Colors.redAccent,
+                  color: item.won ? AppColors.green : AppColors.error,
                 ),
               ),
               Text(
                 item.won ? 'VICTORY' : 'DEFEAT',
-                style: TextStyle(
+                style: GoogleFonts.jetBrainsMono(
                   fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: (item.won ? Colors.greenAccent : Colors.redAccent).withOpacity(0.5),
+                  fontWeight: FontWeight.w900,
+                  color: (item.won ? AppColors.green : AppColors.error).withOpacity(0.4),
                   letterSpacing: 1,
                 ),
               ),

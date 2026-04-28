@@ -74,41 +74,210 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: AnimationConfiguration.toStaggeredList(
-            duration: const Duration(milliseconds: 600),
-            childAnimationBuilder: (widget) => SlideAnimation(
-              verticalOffset: 50.0,
-              child: FadeInAnimation(child: widget),
-            ),
-            children: [
-              const SizedBox(height: 40),
-              const _AnimatedWordmark(),
-              const SizedBox(height: 8),
-              const _TypewriterDate(),
-              const SizedBox(height: 40),
-              const DailyChallengeCard(),
-              const SizedBox(height: 24),
-              const _SecondaryButtons(),
-              const SizedBox(height: 40),
-              const Text(
-                'STREAK',
-                style: TextStyle(
-                  letterSpacing: 2,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMuted,
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: AnimationConfiguration.toStaggeredList(
+              duration: const Duration(milliseconds: 600),
+              childAnimationBuilder: (widget) => FadeInAnimation(
+                child: SlideAnimation(
+                  verticalOffset: 20,
+                  child: widget,
                 ),
               ),
-              const SizedBox(height: 16),
-              const StreakDisplay(streak: streak),
-              const SizedBox(height: 120),
-            ],
+              children: [
+                const SizedBox(height: 20),
+                const _NytWordmark(),
+                const SizedBox(height: 12),
+                const _TypewriterDate(),
+                const SizedBox(height: 60),
+                const _ZenHeading(),
+                const SizedBox(height: 20),
+                const _SubscribeButton(),
+                const SizedBox(height: 80),
+                
+                // Collage Mosaic
+                const _CollageMosaic(),
+                
+                const SizedBox(height: 80),
+                const Text(
+                  'YOUR STREAK',
+                  style: TextStyle(
+                    letterSpacing: 4,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                StreakDisplay(streak: streak),
+                const SizedBox(height: 120),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _NytWordmark extends StatelessWidget {
+  const _NytWordmark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'The Scrabble Games',
+      style: GoogleFonts.frankRuhlLibre(
+        fontSize: 24,
+        fontWeight: FontWeight.w900,
+        color: AppColors.textBody,
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+}
+
+class _ZenHeading extends StatelessWidget {
+  const _ZenHeading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Find\nyour\nzen.',
+      textAlign: TextAlign.center,
+      style: GoogleFonts.frankRuhlLibre(
+        fontSize: 56,
+        fontWeight: FontWeight.w900,
+        height: 1.05,
+        color: AppColors.textBody,
+      ),
+    );
+  }
+}
+
+class _SubscribeButton extends StatelessWidget {
+  const _SubscribeButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SpringyFeedback(
+      onTap: () {},
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: AppColors.primary, width: 2),
+        ),
+        child: const Text(
+          'PLAY NOW',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 14,
+            letterSpacing: 1,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CollageMosaic extends StatelessWidget {
+  const _CollageMosaic();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _FloatingShape(
+              color: AppColors.accent,
+              icon: Icons.grid_on_rounded,
+              label: 'PRACTICE',
+              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.practice))),
+            ),
+            _FloatingShape(
+              color: AppColors.secondary,
+              icon: Icons.computer_rounded,
+              label: 'VS CPU',
+              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.vsComputer))),
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _FloatingShape(
+              color: AppColors.orange,
+              icon: Icons.today_rounded,
+              label: 'DAILY',
+              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const GameScreen(mode: GameMode.dailyChallenge))),
+            ),
+            _FloatingShape(
+              color: AppColors.green,
+              icon: Icons.emoji_events_rounded,
+              label: 'STREAKS',
+              onTap: () => Navigator.push(context, ScaleFadePageRoute(page: const StatsScreen())),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FloatingShape extends StatelessWidget {
+  final Color color;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _FloatingShape({
+    required this.color,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SpringyFeedback(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.white, size: 40),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -170,38 +339,6 @@ class _GridPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _AnimatedWordmark extends StatelessWidget {
-  const _AnimatedWordmark();
-
-  @override
-  Widget build(BuildContext context) {
-    const text = 'SCRABBLE';
-    return Row(
-      children: text.split('').asMap().entries.map((entry) {
-        return AnimationConfiguration.staggeredList(
-          position: entry.key,
-          duration: const Duration(milliseconds: 600),
-          child: SlideAnimation(
-            verticalOffset: -50.0,
-            child: ScaleAnimation(
-              scale: 0.5,
-              child: Text(
-                entry.value,
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 42,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primary,
-                  letterSpacing: 4,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
 class _TypewriterDate extends StatelessWidget {
   const _TypewriterDate();
 
@@ -221,237 +358,6 @@ class _TypewriterDate extends StatelessWidget {
         ),
       ],
       isRepeatingAnimation: false,
-    );
-  }
-}
-
-class DailyChallengeCard extends StatelessWidget {
-  const DailyChallengeCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SpringyFeedback(
-      onTap: () {
-        Navigator.of(context).push(
-          ScaleFadePageRoute(page: const GameScreen(mode: GameMode.dailyChallenge)),
-        );
-      },
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.4,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 1),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            // Mini Board Preview
-            const Positioned.fill(child: _MiniBoardPreview()),
-            // Overlay gradient
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      AppColors.surface.withOpacity(0.9),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Labels
-            const Positioned(
-              left: 20,
-              bottom: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'DAILY CHALLENGE',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  _PulsingPlayLabel(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MiniBoardPreview extends StatelessWidget {
-  const _MiniBoardPreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(20),
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        mainAxisSpacing: 4,
-        crossAxisSpacing: 4,
-      ),
-      itemCount: 49,
-      itemBuilder: (context, index) {
-        final hasTile = index % 5 == 0;
-        return AnimationConfiguration.staggeredGrid(
-          position: index,
-          duration: const Duration(milliseconds: 500),
-          columnCount: 7,
-          child: ScaleAnimation(
-            scale: 0.5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: hasTile ? AppColors.primary : Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: hasTile
-                  ? Center(
-                      child: Text(
-                        'A',
-                        style: TextStyle(
-                          color: AppColors.background,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _PulsingPlayLabel extends StatefulWidget {
-  const _PulsingPlayLabel();
-
-  @override
-  State<_PulsingPlayLabel> createState() => _PulsingPlayLabelState();
-}
-
-class _PulsingPlayLabelState extends State<_PulsingPlayLabel> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: Text(
-        'PLAY TODAY',
-        style: TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-}
-
-class _SecondaryButtons extends StatelessWidget {
-  const _SecondaryButtons();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _ModeButton(
-            label: 'PRACTICE',
-            icon: Icons.fitness_center,
-            onTap: () {
-              Navigator.of(context).push(
-                ScaleFadePageRoute(page: const GameScreen(mode: GameMode.practice)),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _ModeButton(
-            label: 'VS COMPUTER',
-            icon: Icons.computer,
-            onTap: () {
-              Navigator.of(context).push(
-                ScaleFadePageRoute(page: const GameScreen(mode: GameMode.vsComputer)),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ModeButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _ModeButton({required this.label, required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return SpringyFeedback(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: AppColors.primary, size: 28),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                letterSpacing: 1,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

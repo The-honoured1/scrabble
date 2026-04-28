@@ -2,45 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF010A1A);
-  static const Color surface = Color(0xFF111D2D);
-  static const Color primary = Color(0xFFF5A623); // Electric Gold
-  static const Color secondary = Color(0xFFFF5E5E); // Vivid Coral
-  static const Color accent = Color(0xFF00E5FF); // Sky Cyan
-  static const Color textBody = Colors.white;
-  static const Color textMuted = Color(0xFFA0AEC0);
+  static const Color background = Color(0xFFFFFFFF);
+  static const Color surface = Color(0xFFF7F7F7);
+  static const Color primary = Color(0xFF121212); // Deep Black for text
+  static const Color secondary = Color(0xFFAC87ED); // Soft Purple
+  static const Color accent = Color(0xFF5E90E0); // Soft Blue
+  static const Color textBody = Color(0xFF121212);
+  static const Color textMuted = Color(0xFF757575);
+  
+  // Design shapes
+  static const Color green = Color(0xFF63A160);
+  static const Color yellow = Color(0xFFF2C144);
+  static const Color orange = Color(0xFFF39233);
   
   // Premium square colors
-  static const Color doubleLetter = Color(0xFF2D3748);
-  static const Color tripleLetter = Color(0xFF4A5568);
-  static const Color doubleWord = Color(0xFFFF9F1C);
-  static const Color tripleWord = Color(0xFFFF4D4D);
+  static const Color doubleLetter = Color(0xFFD3E6F5);
+  static const Color tripleLetter = Color(0xFFB0D4F1);
+  static const Color doubleWord = Color(0xFFF5D3D3);
+  static const Color tripleWord = Color(0xFFF1B0B0);
 }
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData get lightTheme {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.surface,
-        background: AppColors.background,
+        onSurface: AppColors.primary,
       ),
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.playfairDisplay(
+        displayLarge: GoogleFonts.frankRuhlLibre(
           fontSize: 48,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w900,
           color: AppColors.textBody,
         ),
-        displayMedium: GoogleFonts.playfairDisplay(
+        displayMedium: GoogleFonts.frankRuhlLibre(
           fontSize: 32,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w900,
           color: AppColors.textBody,
         ),
         bodyLarge: GoogleFonts.inter(
           fontSize: 18,
+          fontWeight: FontWeight.w500,
           color: AppColors.textBody,
         ),
         bodyMedium: GoogleFonts.inter(
@@ -48,9 +54,10 @@ class AppTheme {
           color: AppColors.textBody,
         ),
         labelLarge: GoogleFonts.jetBrainsMono(
-          fontSize: 14,
+          fontSize: 12,
           fontWeight: FontWeight.bold,
           color: AppColors.textMuted,
+          letterSpacing: 2,
         ),
       ),
     );

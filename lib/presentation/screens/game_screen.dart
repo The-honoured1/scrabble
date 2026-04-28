@@ -17,22 +17,13 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
-  late ConfettiController _confettiController;
-  late AnimationController _boardController;
-  late AnimationController _rackController;
-  late AnimationController _shakeController;
-  late Animation<double> _shakeAnimation;
+  late GameController _gameController;
   
-  double _playerScore = 124;
-  double _opponentScore = 98;
-  int _moveCount = 14;
-
-  final List<String> _rackTiles = ['S', 'C', 'R', 'A', 'B', 'B', 'L'];
-  final List<PlacedTile> _boardTiles = [];
-
   @override
   void initState() {
     super.initState();
+    _gameController = GameController();
+    _gameController.addListener(() => setState(() {}));
     _confettiController = ConfettiController(duration: const Duration(seconds: 2));
     _boardController = AnimationController(
       vsync: this,
@@ -125,9 +116,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           child: Column(
             children: [
               _GameHUD(
-                playerScore: _playerScore,
-                opponentScore: _opponentScore,
-                moveCount: _moveCount,
+                playerScore: _gameController.state.playerScore.toDouble(),
+                opponentScore: _gameController.state.cpuScore.toDouble(),
+                moveCount: _gameController.state.moveCount,
               ),
               Expanded(
                 child: Stack(
@@ -503,21 +494,24 @@ class _TileRack extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: tiles.asMap().entries.map((entry) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: AnimationConfiguration.staggeredList(
-                    position: entry.key,
-                    duration: const Duration(milliseconds: 600),
-                    child: SlideAnimation(
-                      verticalOffset: 20,
-                      child: _DraggableTile(letter: entry.value),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: tiles.asMap().entries.map((entry) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: AnimationConfiguration.staggeredList(
+                      position: entry.key,
+                      duration: const Duration(milliseconds: 600),
+                      child: SlideAnimation(
+                        verticalOffset: 20,
+                        child: _DraggableTile(letter: entry.value),
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
             const SizedBox(height: 24),
             SpringyFeedback(

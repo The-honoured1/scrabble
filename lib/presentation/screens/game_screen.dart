@@ -10,10 +10,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:scrabble/services/dictionary_service.dart';
 import 'package:scrabble/controllers/game_controller.dart';
 import 'package:scrabble/models/tile_model.dart';
-import 'package:scrabble/models/board_model.dart';
+import 'package:scrabble/models/game_mode.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  final GameMode mode;
+  const GameScreen({super.key, this.mode = GameMode.vsComputer});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -30,7 +31,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _gameController = GameController();
+    _gameController = GameController(mode: widget.mode);
     _gameController.addListener(() => setState(() {}));
     _confettiController = ConfettiController(duration: const Duration(seconds: 2));
     _boardController = AnimationController(

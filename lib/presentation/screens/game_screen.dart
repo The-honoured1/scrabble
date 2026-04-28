@@ -6,6 +6,7 @@ import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:scrabble/services/dictionary_service.dart';
 
 class GameScreen extends StatefulWidget {
@@ -141,7 +142,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       child: ConfettiWidget(
                         confettiController: _confettiController,
                         blastDirectionality: BlastDirectionality.explosive,
-                        colors: const [Colors.gold, Colors.white, Colors.orange],
+                        colors: const [AppColors.primary, Colors.white, Colors.orange],
                       ),
                     ),
                   ],

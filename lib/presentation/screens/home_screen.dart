@@ -6,6 +6,7 @@ import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:scrabble/presentation/screens/game_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:animate_do/animate_do.dart';
 
 import 'package:scrabble/presentation/screens/stats_screen.dart';
 import 'package:scrabble/presentation/screens/settings_screen.dart';
@@ -572,7 +573,7 @@ class _NavIcon extends StatelessWidget {
           AnimatedScale(
             scale: isSelected ? 1.2 : 1.0,
             duration: const Duration(milliseconds: 200),
-            curve: Curves.backOut,
+            curve: Curves.easeOutBack,
             child: Icon(
               icon,
               color: isSelected ? AppColors.primary : AppColors.textMuted,

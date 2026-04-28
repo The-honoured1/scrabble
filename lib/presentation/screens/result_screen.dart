@@ -54,7 +54,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                 confettiController: _confettiController,
                 blastDirectionality: BlastDirectionality.explosive,
                 shouldLoop: true,
-                colors: const [Colors.gold, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+                colors: const [AppColors.primary, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
               ),
             ),
           

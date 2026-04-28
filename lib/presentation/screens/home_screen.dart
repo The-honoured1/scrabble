@@ -421,7 +421,7 @@ class StreakDisplay extends StatelessWidget {
           duration: const Duration(milliseconds: 600),
           child: SlideAnimation(
             horizontalOffset: 20,
-            child: ElasticInAnimation(
+            child: ElasticIn(
               child: _StreakSquare(
                 isFilled: isFilled,
                 isCurrent: isCurrent,

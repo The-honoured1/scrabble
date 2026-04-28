@@ -5,10 +5,12 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:scrabble/presentation/screens/game_screen.dart';
+import 'package:scrabble/models/game_mode.dart';
 import 'package:intl/intl.dart';
 import 'package:animate_do/animate_do.dart';
 
 import 'package:scrabble/presentation/screens/stats_screen.dart';
+import 'package:scrabble/presentation/screens/history_screen.dart';
 import 'package:scrabble/presentation/screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,9 +22,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  int _streak = 0;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final s = await StatsService.getStats();
+    if (mounted) setState(() => _streak = s['currentStreak'] ?? 0);
+  }
     return Scaffold(
       body: Stack(
         children: [
@@ -32,9 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
           IndexedStack(
             index: _selectedIndex,
             children: [
-              _HomeContent(),
+              _HomeContent(streak: _streak),
               const StatsScreen(),
-              const StatsScreen(), // History placeholder
+              const HistoryScreen(),
               const SettingsScreen(),
             ],
           ),
@@ -54,6 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _HomeContent extends StatelessWidget {
+  final int streak;
+  const _HomeContent({required this.streak});
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -86,7 +100,7 @@ class _HomeContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const StreakDisplay(),
+              const StreakDisplay(streak: streak),
               const SizedBox(height: 120),
             ],
           ),
@@ -104,17 +118,18 @@ class _ParallaxBackground extends StatelessWidget {
     // In a real app with sensors_plus, we'd use sensor data to offset this.
     // For now, we'll use a slow subtle animation or just a static grid.
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.background,
-        image: DecorationImage(
-          image: const NetworkImage('https://www.transparenttextures.com/patterns/carbon-fibre.png'),
-          opacity: 0.1,
-          repeat: ImageRepeat.repeat,
-        ),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
+      child: Stack(
+        children: [
+          CustomPaint(
+            painter: _GridPainter(),
+            size: Size.infinite,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.5,
             colors: [
@@ -126,6 +141,27 @@ class _ParallaxBackground extends StatelessWidget {
       ),
     );
   }
+}
+
+class _GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.02)
+      ..strokeWidth = 1;
+
+    const spacing = 30.0;
+
+    for (double i = 0; i < size.width; i += spacing) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+    for (double i = 0; i < size.height; i += spacing) {
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AnimatedWordmark extends StatelessWidget {
@@ -191,7 +227,7 @@ class DailyChallengeCard extends StatelessWidget {
     return SpringyFeedback(
       onTap: () {
         Navigator.of(context).push(
-          ScaleFadePageRoute(page: const GameScreen()),
+          ScaleFadePageRoute(page: const GameScreen(mode: GameMode.dailyChallenge)),
         );
       },
       child: Container(
@@ -353,7 +389,11 @@ class _SecondaryButtons extends StatelessWidget {
           child: _ModeButton(
             label: 'PRACTICE',
             icon: Icons.fitness_center,
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                ScaleFadePageRoute(page: const GameScreen(mode: GameMode.practice)),
+              );
+            },
           ),
         ),
         const SizedBox(width: 16),
@@ -361,7 +401,11 @@ class _SecondaryButtons extends StatelessWidget {
           child: _ModeButton(
             label: 'VS COMPUTER',
             icon: Icons.computer,
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                ScaleFadePageRoute(page: const GameScreen(mode: GameMode.vsComputer)),
+              );
+            },
           ),
         ),
       ],
@@ -407,15 +451,16 @@ class _ModeButton extends StatelessWidget {
 }
 
 class StreakDisplay extends StatelessWidget {
-  const StreakDisplay({super.key});
+  final int streak;
+  const StreakDisplay({super.key, required this.streak});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(7, (index) {
-        final isFilled = index < 3;
-        final isCurrent = index == 3;
+        final isFilled = index < streak;
+        final isCurrent = index == streak;
         return AnimationConfiguration.staggeredList(
           position: index,
           duration: const Duration(milliseconds: 600),

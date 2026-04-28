@@ -6,14 +6,16 @@ import '../services/dictionary_service.dart';
 import '../services/move_validator.dart';
 import '../services/cpu_engine.dart';
 import '../services/stats_service.dart';
+import '../models/game_mode.dart';
 
 class GameController extends ChangeNotifier {
+  final GameMode mode;
   late GameState state;
   final DictionaryService _dictionary = DictionaryService();
 
   List<TilePlacement> pendingPlacements = [];
 
-  GameController() {
+  GameController({this.mode = GameMode.vsComputer}) {
     state = GameState.initialize();
   }
 
@@ -104,7 +106,7 @@ class GameController extends ChangeNotifier {
   }
 
   void _triggerCpuTurn() async {
-    if (state.isPlayerTurn) return;
+    if (state.isPlayerTurn || mode == GameMode.practice) return;
 
     await Future.delayed(const Duration(seconds: 2));
     
@@ -139,8 +141,10 @@ class GameController extends ChangeNotifier {
     if (bagEmpty && (playerDone || cpuDone)) {
       StatsService.recordGame(
         score: state.playerScore,
+        cpuScore: state.cpuScore,
         won: state.playerScore > state.cpuScore,
-        bestWord: 0, // Would need actual best word tracking
+        bestWord: 0, 
+        mode: mode.toString().split('.').last.toUpperCase(),
       );
       // Navigate to results screen or show overlay
     }

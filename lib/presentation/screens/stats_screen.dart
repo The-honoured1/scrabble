@@ -5,6 +5,7 @@ import 'package:scrabble/core/motion.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import 'package:scrabble/services/stats_service.dart';
+import 'package:scrabble/services/history_service.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -15,16 +16,21 @@ class StatsScreen extends StatefulWidget {
 
 class _StatsScreenState extends State<StatsScreen> {
   Map<String, dynamic>? _stats;
+  List<HistoryItem>? _history;
 
   @override
   void initState() {
     super.initState();
-    _loadStats();
+    _loadData();
   }
 
-  Future<void> _loadStats() async {
+  Future<void> _loadData() async {
     final s = await StatsService.getStats();
-    if (mounted) setState(() => _stats = s);
+    final h = await HistoryService.getHistory();
+    if (mounted) setState(() {
+      _stats = s;
+      _history = h;
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -64,8 +70,9 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const _ScoreDistributionChart(),
-                
+                _stats == null 
+                    ? const SizedBox()
+                    : _ScoreDistributionChart(distribution: _stats!['scoreDistribution']),
                 const SizedBox(height: 48),
 
                 // Calendar Grid
@@ -78,7 +85,9 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const _CalendarGrid(),
+                _history == null
+                    ? const SizedBox()
+                    : _CalendarGrid(history: _history!),
                 
                 const SizedBox(height: 100),
               ],
@@ -202,15 +211,18 @@ class _CountingNumberState extends State<_CountingNumber> with SingleTickerProvi
 }
 
 class _ScoreDistributionChart extends StatelessWidget {
-  const _ScoreDistributionChart();
+  const _ScoreDistributionChart({this.distribution});
+  final List<dynamic>? distribution;
 
   @override
   Widget build(BuildContext context) {
-    final values = [0.4, 0.6, 0.8, 0.7, 0.9, 0.5];
+    final List<int> values = List<int>.from(distribution ?? [0, 0, 0, 0, 0, 0]);
+    final maxVal = values.isEmpty ? 1 : values.reduce((a, b) => a > b ? a : b);
     final labels = ['0-100', '101-200', '201-300', '301-400', '401-500', '500+'];
 
     return Column(
       children: List.generate(values.length, (index) {
+        final ratio = maxVal == 0 ? 0.0 : values[index] / maxVal;
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Row(
@@ -228,9 +240,14 @@ class _ScoreDistributionChart extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _GrowBar(
-                  value: values[index],
-                  isCurrent: index == 4,
+                  value: ratio.clamp(0.05, 1.0), // Min width for visibility
+                  isCurrent: false,
                 ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${values[index]}',
+                style: GoogleFonts.jetBrainsMono(fontSize: 10, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -302,10 +319,15 @@ class _GrowBarState extends State<_GrowBar> with SingleTickerProviderStateMixin 
 }
 
 class _CalendarGrid extends StatelessWidget {
-  const _CalendarGrid();
+  final List<HistoryItem> history;
+  const _CalendarGrid({required this.history});
 
   @override
   Widget build(BuildContext context) {
+    // Generate last 28 days
+    final now = DateTime.now();
+    final days = List.generate(28, (i) => now.subtract(Duration(days: 27 - i)));
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -316,7 +338,11 @@ class _CalendarGrid extends StatelessWidget {
       ),
       itemCount: 28,
       itemBuilder: (context, index) {
-        final isFilled = index % 3 == 0;
+        final day = days[index];
+        final playedOnDay = history.any((h) => 
+          h.date.year == day.year && h.date.month == day.month && h.date.day == day.day
+        );
+
         return AnimationConfiguration.staggeredGrid(
           position: index,
           duration: const Duration(milliseconds: 400),
@@ -325,7 +351,7 @@ class _CalendarGrid extends StatelessWidget {
             child: FadeInAnimation(
               child: Container(
                 decoration: BoxDecoration(
-                  color: isFilled ? AppColors.primary.withOpacity(0.8) : Colors.white.withOpacity(0.03),
+                  color: playedOnDay ? AppColors.primary.withOpacity(0.8) : Colors.white.withOpacity(0.03),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),

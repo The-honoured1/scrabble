@@ -6,6 +6,7 @@ import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:scrabble/services/dictionary_service.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -18,6 +19,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   late ConfettiController _confettiController;
   late AnimationController _boardController;
   late AnimationController _rackController;
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
   
   double _playerScore = 124;
   double _opponentScore = 98;
@@ -38,13 +41,23 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    
+    _shakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
 
     _startEntrance();
     _initMockBoard();
   }
 
   void _initMockBoard() {
-    // Add some initial tiles to the board for the entrance animation
     _boardTiles.addAll([
       PlacedTile(letter: 'W', x: 7, y: 7),
       PlacedTile(letter: 'O', x: 8, y: 7),
@@ -69,61 +82,78 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     _confettiController.dispose();
     _boardController.dispose();
     _rackController.dispose();
+    _shakeController.dispose();
     super.dispose();
   }
 
   void _onCommit() async {
     HapticService.medium();
-    // Mock validity check
+    
+    // In a real game, logic would extract the word from placed tiles
+    const String simulatedWord = 'SCRABBLE';
+    final isValid = DictionaryService().isValidWord(simulatedWord);
+
     await Future.delayed(const Duration(milliseconds: 200));
     
-    // For demo, let's say it's valid
-    _confettiController.play();
-    HapticService.success();
-    setState(() {
-      _playerScore += 88;
-      _moveCount++;
-    });
+    if (isValid) {
+      _confettiController.play();
+      HapticService.success();
+      setState(() {
+        _playerScore += 88;
+        _moveCount++;
+      });
+    } else {
+      _shakeController.forward(from: 0);
+      HapticService.heavy();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // HUD
-            const _GameHUD(),
-            
-            // Board Area
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  _ScrabbleBoard(
-                    controller: _boardController,
-                    placedTiles: _boardTiles,
-                  ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: ConfettiWidget(
-                      confettiController: _confettiController,
-                      blastDirectionality: BlastDirectionality.explosive,
-                      colors: const [Colors.gold, Colors.white, Colors.orange],
-                    ),
-                  ),
-                ],
+    return AnimatedBuilder(
+      animation: _shakeAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(_shakeAnimation.value, 0),
+          child: child,
+        );
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _GameHUD(
+                playerScore: _playerScore,
+                opponentScore: _opponentScore,
+                moveCount: _moveCount,
               ),
-            ),
-
-            // Rack Area
-            _TileRack(
-              controller: _rackController,
-              tiles: _rackTiles,
-              onCommit: _onCommit,
-            ),
-          ],
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    _ScrabbleBoard(
+                      controller: _boardController,
+                      placedTiles: _boardTiles,
+                    ),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ConfettiWidget(
+                        confettiController: _confettiController,
+                        blastDirectionality: BlastDirectionality.explosive,
+                        colors: const [Colors.gold, Colors.white, Colors.orange],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _TileRack(
+                controller: _rackController,
+                tiles: _rackTiles,
+                onCommit: _onCommit,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -131,12 +161,18 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 }
 
 class _GameHUD extends StatelessWidget {
-  const _GameHUD();
+  final double playerScore;
+  final double opponentScore;
+  final int moveCount;
+
+  const _GameHUD({
+    required this.playerScore,
+    required this.opponentScore,
+    required this.moveCount,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Access state via parent state or provider. Here we'll just mock for layout.
-    // In a real impl, these would be reactive.
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: const BoxDecoration(
@@ -145,10 +181,7 @@ class _GameHUD extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Player
-          const _HUDScoreItem(label: 'YOU', score: 124, isPlayer: true),
-          
-          // Game Title / Move
+          _HUDScoreItem(label: 'YOU', score: playerScore, isPlayer: true),
           Column(
             children: [
               Text(
@@ -159,15 +192,13 @@ class _GameHUD extends StatelessWidget {
                   letterSpacing: 1.5,
                 ),
               ),
-              const Text(
-                'MOVE 14',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              Text(
+                'MOVE $moveCount',
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
               ),
             ],
           ),
-
-          // Opponent
-          const _HUDScoreItem(label: 'CPU', score: 98, isPlayer: false),
+          _HUDScoreItem(label: 'CPU', score: opponentScore, isPlayer: false),
         ],
       ),
     );
@@ -252,7 +283,6 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
             padding: const EdgeInsets.all(4),
             child: Stack(
               children: [
-                // Grid Background
                 GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -271,7 +301,6 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
                     return const _BoardCell();
                   },
                 ),
-                // Placed Tiles
                 ...widget.placedTiles.map((tile) {
                   return _AnimatedPlacedTile(
                     tile: tile,
@@ -386,14 +415,14 @@ class _AnimatedPlacedTile extends StatelessWidget {
         final t = CurvedAnimation(
           parent: boardController,
           curve: Interval(
-            (tile.x + tile.y) / 30, // Stagger based on position
+            (tile.x + tile.y) / 30,
             1.0,
             curve: Curves.elasticOut,
           ),
         ).value;
 
-        final currentX = lerpDouble(startX, tile.x * (cellSize + 2), t)!;
-        final currentY = lerpDouble(startY, tile.y * (cellSize + 2), t)!;
+        final currentX = startX + (tile.x * (cellSize + 2) - startX) * t;
+        final currentY = startY + (tile.y * (cellSize + 2) - startY) * t;
 
         return Positioned(
           left: currentX,
@@ -409,8 +438,6 @@ class _AnimatedPlacedTile extends StatelessWidget {
       },
     );
   }
-
-  double? lerpDouble(num a, num b, double t) => a + (b - a) * t;
 }
 
 class _TileWidget extends StatelessWidget {

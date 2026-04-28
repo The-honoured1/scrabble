@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/presentation/screens/splash_screen.dart';
 
-void main() {
+import 'package:scrabble/services/dictionary_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DictionaryService().loadDictionary();
   runApp(const ScrabbleApp());
 }
 

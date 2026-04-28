@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:scrabble/core/theme.dart';
 import 'package:scrabble/core/motion.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:scrabble/presentation/screens/asset_management_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -63,12 +64,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _SettingsToggle(label: 'TILE MAGNETISM', initialValue: false),
                   ],
                 ),
-                
-                const _SettingsGroup(
+
+                _SettingsGroup(
                   title: 'APPEARANCE',
                   children: [
-                    _SettingsToggle(label: 'HIGH CONTRAST', initialValue: false),
-                    _SettingsToggle(label: 'DARK MODE', initialValue: true),
+                    _SettingsRow(
+                      label: 'ASSET MANAGEMENT',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          ScaleFadePageRoute(page: const AssetManagementScreen()),
+                        );
+                      },
+                    ),
+                    const _SettingsToggle(label: 'HIGH CONTRAST', initialValue: false),
+                    const _SettingsToggle(label: 'DARK MODE', initialValue: true),
                   ],
                 ),
 
@@ -212,8 +222,9 @@ class _SettingsToggleState extends State<_SettingsToggle> with SingleTickerProvi
 
 class _SettingsRow extends StatelessWidget {
   final String label;
+  final VoidCallback? onTap;
 
-  const _SettingsRow({required this.label});
+  const _SettingsRow({required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -224,7 +235,7 @@ class _SettingsRow extends StatelessWidget {
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
       trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }
@@ -243,7 +254,7 @@ class _BurstPainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
-    final center = Offset(size.width / 2 + 15, size.height / 2); // Offset toward the toggle thumb
+    final center = Offset(size.width / 2 + 15, size.height / 2);
     final radius = 20 + animation.value * 20;
 
     for (int i = 0; i < 8; i++) {

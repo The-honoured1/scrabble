@@ -3,6 +3,7 @@ import '../models/game_state.dart';
 import '../models/tile_model.dart';
 import '../models/board_model.dart';
 import '../services/dictionary_service.dart';
+import '../services/move_validator.dart';
 
 class GameController extends ChangeNotifier {
   late GameState state;
@@ -68,14 +69,7 @@ class GameController extends ChangeNotifier {
   }
 
   List<FormedWord> _detectWords() {
-    // Basic logic: if multiple tiles, they must be in a line.
-    // This part is complex. For version 1 of "fully fledged", 
-    // I'll implement a simplified detection that finds horizontal/vertical runs.
-    
-    List<FormedWord> formedWords = [];
-    // ... complex logic to trace words ...
-    // Placeholder: just return the principal word formed by pending tiles if they are aligned
-    return formedWords; 
+    return MoveValidator.findFormedWords(state.board, pendingPlacements);
   }
 
   int _calculateScore(List<FormedWord> words) {

@@ -8,6 +8,9 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scrabble/services/dictionary_service.dart';
+import 'package:scrabble/controllers/game_controller.dart';
+import 'package:scrabble/models/tile_model.dart';
+import 'package:scrabble/models/board_model.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -18,7 +21,12 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   late GameController _gameController;
-  
+  late ConfettiController _confettiController;
+  late AnimationController _boardController;
+  late AnimationController _rackController;
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -46,20 +54,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
 
     _startEntrance();
-    _initMockBoard();
-  }
-
-  void _initMockBoard() {
-    _boardTiles.addAll([
-      PlacedTile(letter: 'W', x: 7, y: 7),
-      PlacedTile(letter: 'O', x: 8, y: 7),
-      PlacedTile(letter: 'R', x: 9, y: 7),
-      PlacedTile(letter: 'D', x: 10, y: 7),
-      PlacedTile(letter: 'G', x: 7, y: 8),
-      PlacedTile(letter: 'A', x: 7, y: 9),
-      PlacedTile(letter: 'M', x: 7, y: 10),
-      PlacedTile(letter: 'E', x: 7, y: 11),
-    ]);
   }
 
   Future<void> _startEntrance() async {
@@ -126,7 +120,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   children: [
                     _ScrabbleBoard(
                       controller: _boardController,
-                      placedTiles: _boardTiles,
+                      gameController: _gameController,
                     ),
                     Align(
                       alignment: Alignment.topCenter,
@@ -141,8 +135,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               ),
               _TileRack(
                 controller: _rackController,
-                tiles: _rackTiles,
-                onCommit: _onCommit,
+                gameController: _gameController,
               ),
             ],
           ),
@@ -236,9 +229,9 @@ class _HUDScoreItem extends StatelessWidget {
 
 class _ScrabbleBoard extends StatefulWidget {
   final AnimationController controller;
-  final List<PlacedTile> placedTiles;
+  final GameController gameController;
 
-  const _ScrabbleBoard({required this.controller, required this.placedTiles});
+  const _ScrabbleBoard({required this.controller, required this.gameController});
 
   @override
   State<_ScrabbleBoard> createState() => _ScrabbleBoardState();
@@ -283,39 +276,67 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
                     crossAxisSpacing: 2,
                   ),
                   itemCount: 225,
-                  itemBuilder: (context, index) {
-                    final x = index % 15;
-                    final y = index ~/ 15;
-                    final isPremium = (x == 0 || x == 7 || x == 14) && (y == 0 || y == 7 || y == 14);
-                    if (isPremium && !(x == 7 && y == 7)) {
-                      return const _PremiumSquare();
-                    }
-                    return const _BoardCell();
-                  },
-                ),
-                ...widget.placedTiles.map((tile) {
-                  return _AnimatedPlacedTile(
-                    tile: tile,
-                    boardController: widget.controller,
-                    cellSize: (size - 8) / 15,
-                  );
-                }),
-              ],
-            ),
-          );
-
-          if (_shimmerActive) {
-            return Shimmer.fromColors(
-              baseColor: Colors.transparent,
-              highlightColor: Colors.white.withOpacity(0.1),
-              period: const Duration(seconds: 1),
-              child: board,
+                    itemBuilder: (context, index) {
+                      final x = index % 15;
+                      final y = index ~/ 15;
+                      final square = widget.gameController.state.board[y][x];
+                      
+                      return _BoardCell(
+                        square: square,
+                        onTileDropped: (tile) => widget.gameController.placeTile(tile, x, y),
+                      );
+                    },
+                  ),
+                  // Render permanent tiles
+                  ..._buildPlacedTiles(size),
+                  // Render pending tiles
+                  ..._buildPendingTiles(size),
+                ],
+              ),
             );
+
+            if (_shimmerActive) {
+              return Shimmer.fromColors(
+                baseColor: Colors.transparent,
+                highlightColor: Colors.white.withOpacity(0.1),
+                period: const Duration(seconds: 1),
+                child: board,
+              );
+            }
+            return board;
+          },
+        ),
+      );
+    }
+
+    List<Widget> _buildPlacedTiles(double size) {
+      final cellSize = (size - 8) / 15;
+      List<Widget> tiles = [];
+      for (int y = 0; y < 15; y++) {
+        for (int x = 0; x < 15; x++) {
+          final tile = widget.gameController.state.board[y][x].tile;
+          if (tile != null) {
+            tiles.add(Positioned(
+              left: x * (cellSize + 2),
+              top: y * (cellSize + 2),
+              child: _TileWidget(tile: tile, size: cellSize),
+            ));
           }
-          return board;
-        },
-      ),
-    );
+        }
+      }
+      return tiles;
+    }
+
+    List<Widget> _buildPendingTiles(double size) {
+      final cellSize = (size - 8) / 15;
+      return widget.gameController.pendingPlacements.map((p) {
+        return Positioned(
+          left: p.x * (cellSize + 2),
+          top: p.y * (cellSize + 2),
+          child: _TileWidget(tile: p.tile, size: cellSize),
+        );
+      }).toList();
+    }
   }
 }
 
@@ -371,16 +392,58 @@ class _PremiumSquareState extends State<_PremiumSquare> with SingleTickerProvide
 }
 
 class _BoardCell extends StatelessWidget {
-  const _BoardCell();
+  final BoardSquare square;
+  final Function(ScrabbleTile) onTileDropped;
+
+  const _BoardCell({required this.square, required this.onTileDropped});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(2),
-      ),
+    return DragTarget<ScrabbleTile>(
+      onWillAccept: (data) => square.tile == null,
+      onAccept: onTileDropped,
+      builder: (context, candidateData, rejectedData) {
+        final isPremium = square.multiplier != MultiplierType.none;
+        final color = _getMultiplierColor();
+        
+        return Container(
+          decoration: BoxDecoration(
+            color: isPremium ? color.withOpacity(0.2) : Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(2),
+          ),
+          child: isPremium ? Center(
+            child: Text(
+              _getMultiplierText(),
+              style: TextStyle(
+                fontSize: 6,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ) : null,
+        );
+      },
     );
+  }
+
+  Color _getMultiplierColor() {
+    switch (square.multiplier) {
+      case MultiplierType.doubleLetter: return AppColors.accent;
+      case MultiplierType.tripleLetter: return Colors.blueAccent;
+      case MultiplierType.doubleWord: return AppColors.primary;
+      case MultiplierType.tripleWord: return AppColors.secondary;
+      default: return Colors.transparent;
+    }
+  }
+
+  String _getMultiplierText() {
+    switch (square.multiplier) {
+      case MultiplierType.doubleLetter: return '2L';
+      case MultiplierType.tripleLetter: return '3L';
+      case MultiplierType.doubleWord: return '2W';
+      case MultiplierType.tripleWord: return '3W';
+      default: return '';
+    }
   }
 }
 
@@ -433,11 +496,11 @@ class _AnimatedPlacedTile extends StatelessWidget {
 }
 
 class _TileWidget extends StatelessWidget {
-  final String letter;
+  final ScrabbleTile tile;
   final double size;
   final bool isRack;
 
-  const _TileWidget({required this.letter, required this.size, this.isRack = false});
+  const _TileWidget({required this.tile, required this.size, this.isRack = false});
 
   @override
   Widget build(BuildContext context) {
@@ -456,13 +519,30 @@ class _TileWidget extends StatelessWidget {
         ] : null,
       ),
       child: Center(
-        child: Text(
-          letter,
-          style: TextStyle(
-            color: AppColors.background,
-            fontWeight: FontWeight.w900,
-            fontSize: size * 0.6,
-          ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Text(
+              tile.letter,
+              style: TextStyle(
+                color: AppColors.background,
+                fontWeight: FontWeight.w900,
+                fontSize: size * 0.55,
+              ),
+            ),
+            Positioned(
+              right: size * 0.1,
+              bottom: size * 0.1,
+              child: Text(
+                '${tile.points}',
+                style: TextStyle(
+                  color: AppColors.background.withOpacity(0.7),
+                  fontWeight: FontWeight.bold,
+                  fontSize: size * 0.22,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -471,13 +551,11 @@ class _TileWidget extends StatelessWidget {
 
 class _TileRack extends StatelessWidget {
   final AnimationController controller;
-  final List<String> tiles;
-  final VoidCallback onCommit;
+  final GameController gameController;
 
   const _TileRack({
     required this.controller,
-    required this.tiles,
-    required this.onCommit,
+    required this.gameController,
   });
 
   @override
@@ -498,7 +576,7 @@ class _TileRack extends StatelessWidget {
               fit: BoxFit.scaleDown,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: tiles.asMap().entries.map((entry) {
+                children: gameController.state.playerRack.asMap().entries.map((entry) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: AnimationConfiguration.staggeredList(
@@ -506,7 +584,7 @@ class _TileRack extends StatelessWidget {
                       duration: const Duration(milliseconds: 600),
                       child: SlideAnimation(
                         verticalOffset: 20,
-                        child: _DraggableTile(letter: entry.value),
+                        child: _DraggableTile(tile: entry.value, gameController: gameController),
                       ),
                     ),
                   );
@@ -515,7 +593,7 @@ class _TileRack extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             SpringyFeedback(
-              onTap: onCommit,
+              onTap: gameController.commitMove,
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -544,9 +622,10 @@ class _TileRack extends StatelessWidget {
 }
 
 class _DraggableTile extends StatefulWidget {
-  final String letter;
+  final ScrabbleTile tile;
+  final GameController gameController;
 
-  const _DraggableTile({required this.letter});
+  const _DraggableTile({required this.tile, required this.gameController});
 
   @override
   State<_DraggableTile> createState() => _DraggableTileState();
@@ -557,13 +636,16 @@ class _DraggableTileState extends State<_DraggableTile> {
 
   @override
   Widget build(BuildContext context) {
-    return LongPressDraggable<String>(
-      data: widget.letter,
+    // Check if tile is in pending placements
+    final isPending = widget.gameController.pendingPlacements.any((p) => p.tile == widget.tile);
+
+    return LongPressDraggable<ScrabbleTile>(
+      data: widget.tile,
       feedback: Transform.rotate(
         angle: 0.05,
         child: Material(
           color: Colors.transparent,
-          child: _TileWidget(letter: widget.letter, size: 64, isRack: true),
+          child: _TileWidget(tile: widget.tile, size: 64, isRack: true),
         ),
       ),
       onDragStarted: () {
@@ -574,8 +656,8 @@ class _DraggableTileState extends State<_DraggableTile> {
         setState(() => _isDragging = false);
       },
       child: Opacity(
-        opacity: _isDragging ? 0.3 : 1.0,
-        child: _TileWidget(letter: widget.letter, size: 48, isRack: true),
+        opacity: (_isDragging || isPending) ? 0.3 : 1.0,
+        child: _TileWidget(tile: widget.tile, size: 48, isRack: true),
       ),
     );
   }

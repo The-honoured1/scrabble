@@ -49,9 +49,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   Future<void> _startSequence() async {
     await _logoController.forward();
-    await Future.delayed(const Duration(milliseconds: 400));
-    _barsController.forward();
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 200));
     _navigateToHome();
   }
 
@@ -71,40 +69,64 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: AnimatedBuilder(
-          animation: _logoController,
-          builder: (context, child) {
-            final opacity = (_logoController.value).clamp(0.0, 1.0);
-            return Opacity(
-              opacity: opacity,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'The Scrabble Game',
-                    style: GoogleFonts.frankRuhlLibre(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textBody,
-                      letterSpacing: -1,
+      backgroundColor: AppColors.background,
+      body: Stack(
+        children: [
+          Center(
+            child: AnimatedBuilder(
+              animation: _logoController,
+              builder: (context, child) {
+                final scale = 0.8 + (_logoController.value * 0.2);
+                final opacity = _logoController.value;
+                return Transform.scale(
+                  scale: scale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'SCRABBLE',
+                          style: GoogleFonts.frankRuhlLibre(
+                            fontSize: 64,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -2,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 80,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: 60,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.accent,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ],
+                );
+              },
+            ),
+          ),
+          Positioned(
+            bottom: 60,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'PREMIUM EDITION',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 4,
+                  color: AppColors.textMuted.withOpacity(0.5),
+                ),
               ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

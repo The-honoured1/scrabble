@@ -99,9 +99,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    _ScrabbleBoard(
-                      controller: _boardController,
-                      gameController: _gameController,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      child: InteractiveViewer(
+                        boundaryMargin: const EdgeInsets.all(100),
+                        minScale: 0.5,
+                        maxScale: 2.5,
+                        child: _ScrabbleBoard(
+                          controller: _boardController,
+                          gameController: _gameController,
+                        ),
+                      ),
                     ),
                     Align(
                       alignment: Alignment.topCenter,
@@ -256,34 +264,36 @@ class _ScrabbleBoardState extends State<_ScrabbleBoard> {
               ],
             ),
             padding: const EdgeInsets.all(4),
-            child: Stack(
-              children: [
-                GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 15,
-                    mainAxisSpacing: 2,
-                    crossAxisSpacing: 2,
-                  ),
-                  itemCount: 225,
-                    itemBuilder: (context, index) {
-                      final x = index % 15;
-                      final y = index ~/ 15;
-                      final square = widget.gameController.state.board[y][x];
-                      
-                      return _BoardCell(
-                        square: square,
-                        onTileDropped: (tile) => widget.gameController.placeTile(tile, x, y),
-                      );
-                    },
-                  ),
-                  // Render permanent tiles
-                  ..._buildPlacedTiles(size),
-                  // Render pending tiles
-                  ..._buildPendingTiles(size),
-                ],
-              ),
-            );
+            child: RepaintBoundary(
+              child: Stack(
+                children: [
+                  GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 15,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 2,
+                    ),
+                    itemCount: 225,
+                      itemBuilder: (context, index) {
+                        final x = index % 15;
+                        final y = index ~/ 15;
+                        final square = widget.gameController.state.board[y][x];
+                        
+                        return _BoardCell(
+                          square: square,
+                          onTileDropped: (tile) => widget.gameController.placeTile(tile, x, y),
+                        );
+                      },
+                    ),
+                    // Render permanent tiles
+                    ..._buildPlacedTiles(size),
+                    // Render pending tiles
+                    ..._buildPendingTiles(size),
+                  ],
+                ),
+            ),
+          );
 
             if (_shimmerActive) {
               return Shimmer.fromColors(
@@ -397,20 +407,30 @@ class _BoardCell extends StatelessWidget {
         
         return Container(
           decoration: BoxDecoration(
-            color: isPremium ? color : Colors.white,
+            color: isPremium ? color : Colors.black.withOpacity(0.02),
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Colors.black.withOpacity(0.05), width: 0.5),
+            border: Border.all(color: Colors.black.withOpacity(0.03), width: 0.5),
           ),
-          child: isPremium ? Center(
-            child: Text(
-              _getMultiplierText(),
-              style: TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
+          child: Stack(
+            children: [
+              if (isPremium) Center(
+                child: Text(
+                  _getMultiplierText(),
+                  style: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-          ) : null,
+              if (candidateData.isNotEmpty) Container(
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

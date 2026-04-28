@@ -262,24 +262,6 @@ class _ScoreDistributionChart extends StatelessWidget {
   }
 }
 
-class _GrowBar extends StatelessWidget {
-  final double value;
-  final bool isCurrent;
-  const _GrowBar({required this.value, required this.isCurrent});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 12,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.black12,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      alignment: Alignment.centerLeft,
-      child: FractionallySizedBox(
-        widthFactor: value,
-        child: Container(
 class _GrowBar extends StatefulWidget {
   final double value;
   final bool isCurrent;

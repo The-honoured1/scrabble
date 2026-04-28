@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFF7F7F7);
-  static const Color primary = Color(0xFF121212); // Deep Black for text
-  static const Color secondary = Color(0xFFAC87ED); // Soft Purple
-  static const Color accent = Color(0xFF5E90E0); // Soft Blue
-  static const Color textBody = Color(0xFF121212);
-  static const Color textMuted = Color(0xFF757575);
+  static const Color background = Color(0xFFFCFCFC); // Warmer white
+  static const Color surface = Color(0xFFF5F5F5);
+  static const Color primary = Color(0xFF1A1A1A); 
+  static const Color secondary = Color(0xFF9E6CF5); // More vivid purple
+  static const Color accent = Color(0xFF4C84F5); // More vivid blue
+  static const Color textBody = Color(0xFF1A1A1A);
+  static const Color textMuted = Color(0xFF888888);
   
   // Design shapes
-  static const Color green = Color(0xFF63A160);
-  static const Color yellow = Color(0xFFF2C144);
-  static const Color orange = Color(0xFFF39233);
+  static const Color green = Color(0xFF4DA149); // Vivid green
+  static const Color yellow = Color(0xFFF2B705); // Vivid yellow
+  static const Color orange = Color(0xFFF28705); // Vivid orange
+  static const Color error = Color(0xFFD32F2F); // NYT Red
   
   // Premium square colors
   static const Color doubleLetter = Color(0xFFD3E6F5);

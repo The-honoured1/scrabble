@@ -6,7 +6,7 @@ import 'move_validator.dart';
 
 class CpuEngine {
   static Future<List<TilePlacement>?> findMove(GameState state, Set<String> dictionary) async {
-    final random = Random();
+    if (dictionary.isEmpty) return null;
     
     // Get all tiles already on board
     List<Point<int>> boardTiles = [];
@@ -18,16 +18,16 @@ class CpuEngine {
 
     if (boardTiles.isEmpty) {
       // First move must be in center (7,7)
-      return _tryFindWordFromRack(state.cpuRack, dictionary, 7, 7, true);
+      return _tryFindWordFromRack(state.cpuRack, dictionary, 7, 7);
     }
 
-    boardTiles.shuffle();
+    // Shuffle board tiles to try different connection points each time
+    final searchPoints = List<Point<int>>.from(boardTiles)..shuffle();
     
-    // Try first 20 board tiles to find a connection (performance)
-    for (var point in boardTiles.take(20)) {
+    // Try up to 30 board tiles to find a connection
+    for (var point in searchPoints.take(30)) {
       final tileOnBoard = state.board[point.y][point.x].tile!;
       
-      // Try to find a word using rack + tileOnBoard
       final move = _tryFindConnection(state, point.x, point.y, tileOnBoard, dictionary);
       if (move != null) return move;
     }
@@ -44,14 +44,14 @@ class CpuEngine {
   ) {
     final random = Random();
     
-    // Simple greedy: look for words that start or end with tileOnBoard
-    // but that's too simple. Let's just try to place a word horizontally or vertically
-    // passing through (x,y).
-    
     List<String> rackChars = state.cpuRack.map((e) => e.letter).toList();
     
-    for (var word in dictionary.take(1000)) { // Just a slice for speed in prototype
-      if (word.length < 2 || word.length > 7) continue;
+    // Get a larger slice and shuffle it to avoid alphabetical bias
+    final wordList = dictionary.toList();
+    wordList.shuffle();
+
+    for (var word in wordList.take(2000)) { 
+      if (word.length < 2 || word.length > rackChars.length + 1) continue;
       if (!word.contains(tileOnBoard.letter)) continue;
       
       // Check if we have rest of letters
@@ -107,13 +107,22 @@ class CpuEngine {
 
       if (curX > 14 || curY > 14) return null;
       
-      if (curX == x && curY == y) continue; // Skip the one already there
-
-      if (state.board[curY][curX].tile != null) return null; // Clash
-
       final char = word[i];
-      final tile = state.cpuRack.firstWhere((t) => t.letter == char);
-      placements.add(TilePlacement(tile: tile, x: curX, y: curY));
+      final existingTile = state.board[curY][curX].tile;
+
+      if (existingTile != null) {
+        if (existingTile.letter != char) return null; // Mismatch
+        // Else it matches existing, so we don't need to place anything here
+        continue;
+      }
+
+      // Need to place a tile from rack
+      try {
+        final tile = state.cpuRack.firstWhere((t) => t.letter == char && !placements.any((p) => p.tile == t));
+        placements.add(TilePlacement(tile: tile, x: curX, y: curY));
+      } catch (e) {
+        return null; // Don't have the letter in rack
+      }
     }
     
     return placements;
@@ -124,9 +133,39 @@ class CpuEngine {
     Set<String> dictionary,
     int startX,
     int startY,
-    bool horizontal,
   ) {
-    // Simple logic for first move
-    return null; // For now
+    final rackChars = rack.map((e) => e.letter).toList();
+    final wordList = dictionary.toList();
+    wordList.shuffle();
+
+    for (var word in wordList.take(1000)) {
+      if (word.length < 2 || word.length > 7) continue;
+
+      // Check if we can form this word from our rack
+      final needed = word.split('');
+      bool canForm = true;
+      final tempRack = List<String>.from(rackChars);
+      
+      for (var char in needed) {
+        if (tempRack.contains(char)) {
+          tempRack.remove(char);
+        } else {
+          canForm = false;
+          break;
+        }
+      }
+
+      if (canForm) {
+        // Just place it horizontally starting at center
+        List<TilePlacement> placements = [];
+        for (int i = 0; i < word.length; i++) {
+          final char = word[i];
+          final tile = rack.firstWhere((t) => t.letter == char);
+          placements.add(TilePlacement(tile: tile, x: startX + i, y: startY));
+        }
+        return placements;
+      }
+    }
+    return null;
   }
 }

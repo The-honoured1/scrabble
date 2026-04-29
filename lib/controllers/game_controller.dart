@@ -50,6 +50,7 @@ class GameController extends ChangeNotifier {
       // 4. Update board and score
       for (var p in pendingPlacements) {
         state.board[p.y][p.x].tile = p.tile;
+        state.board[p.y][p.x].isPremiumUsed = true; // Mark as used
         state.playerRack.remove(p.tile);
       }
       
@@ -66,9 +67,10 @@ class GameController extends ChangeNotifier {
       
       _triggerCpuTurn();
     } else {
-      // Invalid move - shake UI or show error
-      // For now just clear pending for simplicity in prototype
+      // Invalid move - clear pending to give tiles back to rack
+      pendingPlacements.clear();
       notifyListeners();
+      // Optional: notify UI to show shake/error
     }
   }
 
@@ -108,29 +110,38 @@ class GameController extends ChangeNotifier {
   void _triggerCpuTurn() async {
     if (state.isPlayerTurn || mode == GameMode.practice) return;
 
+    print('CPU thinking...');
     await Future.delayed(const Duration(seconds: 2));
     
-    final cpuMove = await CpuEngine.findMove(state, _dictionary.words ?? {});
-    
-    if (cpuMove != null) {
-      final words = MoveValidator.findFormedWords(state.board, cpuMove);
-      if (words.isNotEmpty) {
-        int moveScore = _calculateScore(words);
-        
-        for (var p in cpuMove) {
-          state.board[p.y][p.x].tile = p.tile;
-          state.cpuRack.remove(p.tile);
+    try {
+      final cpuMove = await CpuEngine.findMove(state, _dictionary.words ?? {});
+      
+      if (cpuMove != null) {
+        print('CPU found move with ${cpuMove.length} tiles');
+        final words = MoveValidator.findFormedWords(state.board, cpuMove);
+        if (words.isNotEmpty) {
+          int moveScore = _calculateScore(words);
+          
+          for (var p in cpuMove) {
+            state.board[p.y][p.x].tile = p.tile;
+            state.board[p.y][p.x].isPremiumUsed = true;
+            state.cpuRack.remove(p.tile);
+          }
+          
+          state.cpuScore += moveScore;
+          _refillRack(state.cpuRack);
         }
-        
-        state.cpuScore += moveScore;
-        _refillRack(state.cpuRack);
+      } else {
+        print('CPU could not find a valid move');
       }
+    } catch (e) {
+      print('Error during CPU turn: $e');
+    } finally {
+      state.isPlayerTurn = true;
+      state.moveCount++;
+      notifyListeners();
+      _checkEndGame();
     }
-    
-    state.isPlayerTurn = true;
-    state.moveCount++;
-    notifyListeners();
-    _checkEndGame();
   }
 
   void _checkEndGame() {

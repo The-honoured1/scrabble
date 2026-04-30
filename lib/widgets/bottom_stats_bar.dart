@@ -49,26 +49,11 @@ class BottomStatsBar extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final compact = constraints.maxWidth < 430;
-
-            final statsRow = Row(
-              children: [
-                _buildStat(context, '$games', 'GAMES'),
-                Container(
-                  width: 1,
-                  height: 24,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  color: AppTheme.border,
-                ),
-                _buildStat(context, '$streak', 'STREAK'),
-                Container(
-                  width: 1,
-                  height: 24,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  color: AppTheme.border,
-                ),
-                _buildStat(context, '$today', 'TODAY'),
-              ],
-            );
+            final stats = [
+              _buildStat(context, '$games', 'GAMES'),
+              _buildStat(context, '$streak', 'STREAK'),
+              _buildStat(context, '$today', 'TODAY'),
+            ];
 
             final caption = Text(
               'Wordie daily archive',
@@ -81,14 +66,28 @@ class BottomStatsBar extends StatelessWidget {
 
             if (compact) {
               return Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [statsRow, const SizedBox(height: 10), caption],
+                children: [
+                  Wrap(spacing: 24, runSpacing: 12, children: stats),
+                  const SizedBox(height: 10),
+                  caption,
+                ],
               );
             }
 
             return Row(
               children: [
-                statsRow,
+                for (var i = 0; i < stats.length; i++) ...[
+                  stats[i],
+                  if (i < stats.length - 1)
+                    Container(
+                      width: 1,
+                      height: 24,
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      color: AppTheme.border,
+                    ),
+                ],
                 const SizedBox(width: 16),
                 Expanded(child: caption),
               ],

@@ -15,82 +15,75 @@ class HomeScreen extends StatelessWidget {
     final featured = allGames.where((game) => game.featured).toList();
     final todayLabel = _formatDate(DateTime.now());
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final horizontalPadding = constraints.maxWidth >= 900 ? 40.0 : 20.0;
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding = constraints.maxWidth >= 900 ? 40.0 : 20.0;
 
-        return Scaffold(
-          body: SafeArea(
-            bottom: false,
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontalPadding,
-                    24,
-                    horizontalPadding,
-                    24,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      _HomeHeader(
-                        streak: appState.streak,
-                        completedToday: appState.todayCompleted,
-                        todayLabel: todayLabel,
-                      ),
-                      const SizedBox(height: 24),
-                      _HeroShowcase(
-                        games: allGames,
-                        todayLabel: todayLabel,
-                        streak: appState.streak,
-                        completedToday: appState.todayCompleted,
-                      ),
-                      const SizedBox(height: 32),
-                      _SectionHeading(
-                        eyebrow: 'FEATURED',
-                        title: 'Editors\' picks',
-                        subtitle:
-                            'A few strong starts if you want the closest thing to the NYT front page vibe.',
-                      ),
-                      const SizedBox(height: 16),
-                      for (var i = 0; i < featured.length; i++) ...[
-                        _FeaturedEditorialCard(
-                          game: featured[i],
-                          isCompleted: appState.isCompleted(featured[i].id),
-                          onTap: () => context.push(featured[i].route),
-                        ),
-                        if (i < featured.length - 1) const SizedBox(height: 12),
-                      ],
-                      const SizedBox(height: 32),
-                      _SectionHeading(
-                        eyebrow: 'ALL GAMES',
-                        title: 'Everything in one place',
-                        subtitle:
-                            'Every puzzle is available here, so you do not have to hunt through separate screens.',
-                      ),
-                      const SizedBox(height: 16),
-                      for (var i = 0; i < allGames.length; i++) ...[
-                        _LibraryGameCard(
-                          game: allGames[i],
-                          isCompleted: appState.isCompleted(allGames[i].id),
-                          onTap: () => context.push(allGames[i].route),
-                        ),
-                        if (i < allGames.length - 1) const SizedBox(height: 12),
-                      ],
-                      const SizedBox(height: 112),
-                    ]),
-                  ),
+            return ListView(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                24,
+                horizontalPadding,
+                132,
+              ),
+              children: [
+                _HomeHeader(
+                  streak: appState.streak,
+                  completedToday: appState.todayCompleted,
+                  todayLabel: todayLabel,
                 ),
+                const SizedBox(height: 24),
+                _HeroShowcase(
+                  games: allGames,
+                  todayLabel: todayLabel,
+                  streak: appState.streak,
+                  completedToday: appState.todayCompleted,
+                ),
+                const SizedBox(height: 32),
+                _SectionHeading(
+                  eyebrow: 'FEATURED',
+                  title: 'Editors\' picks',
+                  subtitle:
+                      'A few strong starts if you want the closest thing to the NYT front page vibe.',
+                ),
+                const SizedBox(height: 16),
+                for (var i = 0; i < featured.length; i++) ...[
+                  _FeaturedEditorialCard(
+                    game: featured[i],
+                    isCompleted: appState.isCompleted(featured[i].id),
+                    onTap: () => context.push(featured[i].route),
+                  ),
+                  if (i < featured.length - 1) const SizedBox(height: 12),
+                ],
+                const SizedBox(height: 32),
+                _SectionHeading(
+                  eyebrow: 'ALL GAMES',
+                  title: 'Everything in one place',
+                  subtitle:
+                      'Every puzzle is available here, so you do not have to hunt through separate screens.',
+                ),
+                const SizedBox(height: 16),
+                for (var i = 0; i < allGames.length; i++) ...[
+                  _LibraryGameCard(
+                    game: allGames[i],
+                    isCompleted: appState.isCompleted(allGames[i].id),
+                    onTap: () => context.push(allGames[i].route),
+                  ),
+                  if (i < allGames.length - 1) const SizedBox(height: 12),
+                ],
               ],
-            ),
-          ),
-          bottomNavigationBar: BottomStatsBar(
-            games: allGames.length,
-            streak: appState.streak,
-            today: appState.todayCompleted,
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
+      bottomNavigationBar: BottomStatsBar(
+        games: allGames.length,
+        streak: appState.streak,
+        today: appState.todayCompleted,
+      ),
     );
   }
 }

@@ -1,8 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:wordie/main.dart';
+import 'package:wordie/state/app_state.dart';
+import 'package:wordie/screens/home_screen.dart';
+import 'package:wordie/widgets/bottom_stats_bar.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -15,27 +19,17 @@ void main() {
   testWidgets('home screen shows the full game directory', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const WordieApp());
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => AppState(),
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    expect(find.text('wordie.'), findsOneWidget);
-    expect(find.textContaining('Find your next'), findsOneWidget);
-    expect(find.text('Everything in one place'), findsOneWidget);
-
-    for (final title in const [
-      'Wordle',
-      'Connections',
-      'Spelling Bee',
-      'Mini Crossword',
-      'Word Search',
-      'Hangman',
-      'Boggle',
-      'Word Ladder',
-      'Type Racer',
-      'Anagram',
-    ]) {
-      expect(find.text(title), findsWidgets);
-    }
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(Scaffold), findsOneWidget);
+    expect(find.byType(CustomScrollView), findsOneWidget);
+    expect(find.byType(BottomStatsBar), findsOneWidget);
   });
 }

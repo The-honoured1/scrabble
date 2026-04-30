@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.ceo3" "\0"
-            VALUE "FileDescription", "scrabble" "\0"
+            VALUE "FileDescription", "wordie" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "scrabble" "\0"
+            VALUE "InternalName", "wordie" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.ceo3. All rights reserved." "\0"
-            VALUE "OriginalFilename", "scrabble.exe" "\0"
-            VALUE "ProductName", "scrabble" "\0"
+            VALUE "OriginalFilename", "wordie.exe" "\0"
+            VALUE "ProductName", "wordie" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

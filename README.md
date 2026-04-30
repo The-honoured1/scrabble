@@ -1,4 +1,4 @@
-# scrabble
+# wordie
 
 A new Flutter project.
 

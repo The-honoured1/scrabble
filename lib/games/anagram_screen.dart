@@ -148,7 +148,7 @@ class _AnagramScreenState extends State<AnagramScreen> {
                   return ActionChip(
                     label: Text(_answer[index], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                     onPressed: () => _removeLetter(index),
-                    backgroundColor: AppTheme.yellow.withOpacity(0.2),
+                    backgroundColor: AppTheme.yellow.withValues(alpha: 0.2),
                   );
                 }),
               ),

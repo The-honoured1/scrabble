@@ -36,8 +36,15 @@ class BottomStatsBar extends StatelessWidget {
           _buildStat(context, '$streak', 'STREAK'),
           Container(width: 1, height: 24, margin: const EdgeInsets.symmetric(horizontal: 16), color: AppTheme.border),
           _buildStat(context, '$today', 'TODAY'),
-          const Spacer(),
-          Text('Made with ♥ · Wordie 2026', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppTheme.textMuted)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'Made with ♥ · Wordie 2026',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppTheme.textMuted),
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );

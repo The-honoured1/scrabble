@@ -127,7 +127,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> with TickerProvid
                     onTap: () => _toggleTile(index),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: selected ? AppTheme.purple.withOpacity(0.14) : AppTheme.surface,
+                          color: selected ? AppTheme.purple.withValues(alpha: 0.14) : AppTheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: selected ? AppTheme.purple : AppTheme.border),
                       ),
@@ -149,7 +149,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> with TickerProvid
                 return Container(
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   decoration: BoxDecoration(
-                    color: _completedGroups[index] ? AppTheme.green.withOpacity(0.16) : AppTheme.surface,
+                    color: _completedGroups[index] ? AppTheme.green.withValues(alpha: 0.16) : AppTheme.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: _completedGroups[index] ? AppTheme.green : AppTheme.border),
                   ),

@@ -161,7 +161,7 @@ class _CrosswordScreenState extends State<CrosswordScreen> {
                               onTap: () => _selectCell(row, col),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: isBlack ? AppTheme.textPrimary : selected ? AppTheme.purple.withOpacity(0.15) : AppTheme.surface,
+                                    color: isBlack ? AppTheme.textPrimary : selected ? AppTheme.purple.withValues(alpha: 0.15) : AppTheme.surface,
                                   border: Border.all(color: AppTheme.border, width: 1),
                                 ),
                                 alignment: Alignment.center,

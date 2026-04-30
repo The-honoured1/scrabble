@@ -173,7 +173,7 @@ class _WordSearchScreenState extends State<WordSearchScreen> {
                               height: tileSize,
                               margin: const EdgeInsets.all(1),
                               decoration: BoxDecoration(
-                                color: selected ? AppTheme.yellow.withOpacity(0.4) : AppTheme.surface,
+                                color: selected ? AppTheme.yellow.withValues(alpha: 0.4) : AppTheme.surface,
                                 border: Border.all(color: AppTheme.border),
                               ),
                               alignment: Alignment.center,

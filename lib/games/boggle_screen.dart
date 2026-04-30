@@ -154,7 +154,7 @@ class _BoggleScreenState extends State<BoggleScreen> {
                               height: tileSize,
                               margin: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
-                                color: selected ? AppTheme.green.withOpacity(0.4) : AppTheme.surface,
+                                color: selected ? AppTheme.green.withValues(alpha: 0.4) : AppTheme.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: AppTheme.border),
                               ),

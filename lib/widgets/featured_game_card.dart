@@ -44,7 +44,7 @@ class FeaturedGameCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontSize: 26, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               Text(game.description, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary, height: 1.5)),
-              const Spacer(),
+              const SizedBox(height: 18),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
                 decoration: BoxDecoration(

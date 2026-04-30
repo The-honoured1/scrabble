@@ -63,7 +63,7 @@ class WordieApp extends StatelessWidget {
   }
 }
 
-PageBuilder _buildPage(Widget child) {
+Page Function(BuildContext, GoRouterState) _buildPage(Widget child) {
   return (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: child,

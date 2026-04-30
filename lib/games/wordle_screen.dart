@@ -235,10 +235,12 @@ class _WordleScreenState extends State<WordleScreen> with TickerProviderStateMix
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(5, (col) => SizedBox(width: 50, height: 60, child: _buildTile(row, col))).expand((tile) sync* {
-            yield tile;
-            if (col < 4) yield const SizedBox(width: 8);
-          }).toList(),
+          children: [
+            for (int col = 0; col < 5; col++) ...[
+              SizedBox(width: 50, height: 60, child: _buildTile(row, col)),
+              if (col < 4) const SizedBox(width: 8),
+            ]
+          ],
         ),
       ),
     );

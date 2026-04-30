@@ -22,27 +22,56 @@ class GameCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppTheme.border),
           ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 28,
-                height: 3,
-                decoration: BoxDecoration(
-                  color: game.accentColor,
-                  borderRadius: BorderRadius.circular(2),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact =
+                  constraints.maxHeight < 120 || constraints.maxWidth < 130;
+              final padding = compact ? 12.0 : 16.0;
+              final titleSpacing = compact ? 4.0 : 8.0;
+              final sectionSpacing = compact ? 8.0 : 12.0;
+              final emojiSize = compact ? 18.0 : 22.0;
+
+              return Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: game.accentColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    SizedBox(height: sectionSpacing),
+                    Text(game.emoji, style: TextStyle(fontSize: emojiSize)),
+                    SizedBox(height: sectionSpacing),
+                    Text(
+                      game.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontSize: compact ? 12 : 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: titleSpacing),
+                    Expanded(
+                      child: Text(
+                        game.description,
+                        maxLines: compact ? 2 : 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 11,
+                          height: compact ? 1.25 : 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(game.emoji, style: const TextStyle(fontSize: 22)),
-              const SizedBox(height: 12),
-              Text(game.title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 13, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              Text(game.description,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 11, height: 1.4)),
-            ],
+              );
+            },
           ),
         ),
       ),

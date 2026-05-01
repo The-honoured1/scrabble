@@ -1,0 +1,1 @@
+ /home/chris/wordie/.dart_tool/flutter_build/b949ceed6d8615fee501425a65717176/dart_build_result.json:  /home/chris/flutter/bin/cache/dart-sdk/version /home/chris/wordie/.dart_tool/package_config.json /home/chris/wordie/pubspec.yaml

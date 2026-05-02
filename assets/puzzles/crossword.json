@@ -1,0 +1,22 @@
+[
+  {
+    "grid": [
+      ["C", "A", "T", null, "D"],
+      ["A", null, "E", null, "O"],
+      ["R", "A", "I", "N", "G"],
+      [null, null, "G", null, null],
+      ["S", "U", "N", null, "S"]
+    ],
+    "clues": {
+      "across": [
+        {"number": 1, "clue": "Feline pet", "answer": "CAT", "row": 0, "col": 0},
+        {"number": 3, "clue": "Wet weather", "answer": "RAIN", "row": 2, "col": 0},
+        {"number": 5, "clue": "Bright star in our sky", "answer": "SUN", "row": 4, "col": 0}
+      ],
+      "down": [
+        {"number": 1, "clue": "Vehicle wheel turns around this", "answer": "CAR", "row": 0, "col": 0},
+        {"number": 2, "clue": "A domesticated animal that barks", "answer": "DOG", "row": 0, "col": 4}
+      ]
+    }
+  }
+]

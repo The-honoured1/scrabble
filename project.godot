@@ -11,8 +11,25 @@ config_version=5
 [application]
 
 config/name="wordie"
+run/main_scene="res://scenes/Home.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
+
+[autoload]
+
+AppTheme="*res://autoloads/AppTheme.gd"
+GameManager="*res://autoloads/GameManager.gd"
+WordBank="*res://autoloads/WordBank.gd"
+SoundManager="*res://autoloads/SoundManager.gd"
+SceneManager="*res://autoloads/SceneManager.gd"
+
+[display]
+
+window/size/viewport_width=390
+window/size/viewport_height=844
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [physics]
 

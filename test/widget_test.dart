@@ -11,6 +11,6 @@ void main() {
     expect(find.textContaining('days'), findsOneWidget);
     expect(find.text('Wordle'), findsOneWidget);
     expect(find.text('Connections'), findsOneWidget);
-    expect(find.text('Completed today'), findsOneWidget);
+    expect(find.textContaining('Ten beloved word games'), findsOneWidget);
   });
 }

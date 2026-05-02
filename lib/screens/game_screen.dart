@@ -89,7 +89,7 @@ class GameScreen extends StatelessWidget {
       WordieGameId.spellingBee =>
         'Use the center letter in every word and keep building your score.',
       WordieGameId.miniCrossword =>
-        'Fill the grid and check your entries when you are ready.',
+        'Tap a clue or cell, switch Across and Down, and fill the mini like a real crossword.',
       WordieGameId.wordSearch =>
         'Trace a word through touching letters, then submit the path.',
       WordieGameId.hangman => 'Guess letters before you run out of misses.',
@@ -169,7 +169,7 @@ class _WordleGameState extends State<_WordleGame> {
     final index = (today.year + today.month + today.day) % _answers.length;
     setState(() {
       _solution = _answers[index];
-      _guesses..clear();
+      _guesses.clear();
       _currentGuess = '';
       _message = 'Build a five-letter word.';
     });
@@ -854,69 +854,170 @@ class _MiniCrosswordGame extends StatefulWidget {
   State<_MiniCrosswordGame> createState() => _MiniCrosswordGameState();
 }
 
-class _MiniCrosswordGameState extends State<_MiniCrosswordGame> {
-  static const List<String> _solution = ['BALL', 'AREA', 'LEAD', 'LADY'];
-  static const List<String> _across = [
-    '1. Round object used in many sports.',
-    '2. A region or amount of space.',
-    '3. To guide or go first.',
-    '4. A polite title for a woman.',
-  ];
-  static const List<String> _down = [
-    '1. Sphere thrown or kicked in a game.',
-    '2. Measurement of a surface.',
-    '3. Opposite of follow.',
-    '4. "___ and the Tramp."',
-  ];
+enum _CrosswordDirection { across, down }
 
-  late List<List<TextEditingController>> _controllers;
-  String _message = 'Fill the square and check your work.';
+class _MiniCrosswordEntry {
+  const _MiniCrosswordEntry({
+    required this.number,
+    required this.direction,
+    required this.row,
+    required this.column,
+    required this.answer,
+    required this.clue,
+  });
+
+  final int number;
+  final _CrosswordDirection direction;
+  final int row;
+  final int column;
+  final String answer;
+  final String clue;
+}
+
+class _MiniCrosswordGameState extends State<_MiniCrosswordGame> {
+  static const List<String> _solution = [
+    'STONE',
+    'TRAIL',
+    'OARED',
+    'NIECE',
+    'ELDER',
+  ];
+  static const List<_MiniCrosswordEntry> _acrossEntries = [
+    _MiniCrosswordEntry(
+      number: 1,
+      direction: _CrosswordDirection.across,
+      row: 0,
+      column: 0,
+      answer: 'STONE',
+      clue: 'Hard piece of granite, say',
+    ),
+    _MiniCrosswordEntry(
+      number: 6,
+      direction: _CrosswordDirection.across,
+      row: 1,
+      column: 0,
+      answer: 'TRAIL',
+      clue: 'Hiking path through the woods',
+    ),
+    _MiniCrosswordEntry(
+      number: 7,
+      direction: _CrosswordDirection.across,
+      row: 2,
+      column: 0,
+      answer: 'OARED',
+      clue: 'Propelled a boat with paddles',
+    ),
+    _MiniCrosswordEntry(
+      number: 8,
+      direction: _CrosswordDirection.across,
+      row: 3,
+      column: 0,
+      answer: 'NIECE',
+      clue: 'Daughter of one\'s sibling',
+    ),
+    _MiniCrosswordEntry(
+      number: 9,
+      direction: _CrosswordDirection.across,
+      row: 4,
+      column: 0,
+      answer: 'ELDER',
+      clue: 'Older or senior',
+    ),
+  ];
+  static const List<_MiniCrosswordEntry> _downEntries = [
+    _MiniCrosswordEntry(
+      number: 1,
+      direction: _CrosswordDirection.down,
+      row: 0,
+      column: 0,
+      answer: 'STONE',
+      clue: 'Pebble or boulder',
+    ),
+    _MiniCrosswordEntry(
+      number: 2,
+      direction: _CrosswordDirection.down,
+      row: 0,
+      column: 1,
+      answer: 'TRAIL',
+      clue: 'Follow behind',
+    ),
+    _MiniCrosswordEntry(
+      number: 3,
+      direction: _CrosswordDirection.down,
+      row: 0,
+      column: 2,
+      answer: 'OARED',
+      clue: 'Moved a skiff with rowing power',
+    ),
+    _MiniCrosswordEntry(
+      number: 4,
+      direction: _CrosswordDirection.down,
+      row: 0,
+      column: 3,
+      answer: 'NIECE',
+      clue: 'Family member in the next generation',
+    ),
+    _MiniCrosswordEntry(
+      number: 5,
+      direction: _CrosswordDirection.down,
+      row: 0,
+      column: 4,
+      answer: 'ELDER',
+      clue: 'More mature',
+    ),
+  ];
+  static const Map<String, int> _cellNumbers = {
+    '0,0': 1,
+    '0,1': 2,
+    '0,2': 3,
+    '0,3': 4,
+    '0,4': 5,
+    '1,0': 6,
+    '2,0': 7,
+    '3,0': 8,
+    '4,0': 9,
+  };
+
+  late List<List<String>> _letters;
+  _GridPoint _selected = const _GridPoint(0, 0);
+  _CrosswordDirection _direction = _CrosswordDirection.across;
+  String _message = 'Fill the mini. Tap the same cell to switch direction.';
   bool _checked = false;
 
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(
-      4,
-      (row) => List.generate(4, (column) => TextEditingController()),
-    );
-  }
-
-  @override
-  void dispose() {
-    for (final row in _controllers) {
-      for (final controller in row) {
-        controller.dispose();
-      }
-    }
-    super.dispose();
+    _letters = List.generate(5, (_) => List<String>.filled(5, ''));
   }
 
   void _check() {
     final solved = _isSolved();
     setState(() {
       _checked = true;
-      _message = solved ? 'Puzzle solved.' : 'Some letters still need work.';
+      _message = solved
+          ? 'Solved. Nice clean mini.'
+          : 'Some squares are still off.';
     });
   }
 
-  void _clear() {
-    for (final row in _controllers) {
-      for (final controller in row) {
-        controller.clear();
+  void _reset() {
+    for (final row in _letters) {
+      for (var column = 0; column < row.length; column++) {
+        row[column] = '';
       }
     }
     setState(() {
       _checked = false;
+      _selected = const _GridPoint(0, 0);
+      _direction = _CrosswordDirection.across;
       _message = 'Grid cleared.';
     });
   }
 
   bool _isSolved() {
-    for (var row = 0; row < 4; row++) {
-      for (var column = 0; column < 4; column++) {
-        if (_controllers[row][column].text.toUpperCase() !=
-            _solution[row][column]) {
+    for (var row = 0; row < 5; row++) {
+      for (var column = 0; column < 5; column++) {
+        if (_letters[row][column] != _solution[row][column]) {
           return false;
         }
       }
@@ -924,91 +1025,550 @@ class _MiniCrosswordGameState extends State<_MiniCrosswordGame> {
     return true;
   }
 
-  bool _isCorrectCell(int row, int column) {
-    return _controllers[row][column].text.toUpperCase() ==
-        _solution[row][column];
+  bool _isCorrectCell(_GridPoint cell) {
+    return _letters[cell.row][cell.column] == _solution[cell.row][cell.column];
+  }
+
+  _MiniCrosswordEntry get _activeEntry => _entryForCell(_selected, _direction);
+
+  _MiniCrosswordEntry _entryForCell(
+    _GridPoint cell,
+    _CrosswordDirection direction,
+  ) {
+    return direction == _CrosswordDirection.across
+        ? _acrossEntries[cell.row]
+        : _downEntries[cell.column];
+  }
+
+  List<_GridPoint> _cellsForEntry(_MiniCrosswordEntry entry) {
+    return List.generate(entry.answer.length, (index) {
+      return entry.direction == _CrosswordDirection.across
+          ? _GridPoint(entry.row, entry.column + index)
+          : _GridPoint(entry.row + index, entry.column);
+    });
+  }
+
+  bool _entrySolved(_MiniCrosswordEntry entry) {
+    final cells = _cellsForEntry(entry);
+    for (var i = 0; i < cells.length; i++) {
+      final cell = cells[i];
+      if (_letters[cell.row][cell.column] != entry.answer[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  String _entryFill(_MiniCrosswordEntry entry) {
+    final cells = _cellsForEntry(entry);
+    return cells
+        .map(
+          (cell) => _letters[cell.row][cell.column].isEmpty
+              ? '·'
+              : _letters[cell.row][cell.column],
+        )
+        .join();
+  }
+
+  bool _cellInActiveEntry(_GridPoint cell) {
+    return _cellsForEntry(_activeEntry).contains(cell);
+  }
+
+  void _selectCell(_GridPoint cell, {bool toggleIfSame = false}) {
+    setState(() {
+      if (_selected == cell && toggleIfSame) {
+        _direction = _direction == _CrosswordDirection.across
+            ? _CrosswordDirection.down
+            : _CrosswordDirection.across;
+      } else {
+        _selected = cell;
+      }
+      _message =
+          '${_activeEntry.number}${_direction == _CrosswordDirection.across ? 'A' : 'D'}: ${_activeEntry.clue}';
+    });
+  }
+
+  void _jumpToEntry(_MiniCrosswordEntry entry) {
+    setState(() {
+      _selected = _GridPoint(entry.row, entry.column);
+      _direction = entry.direction;
+      _message =
+          '${entry.number}${entry.direction == _CrosswordDirection.across ? 'A' : 'D'}: ${entry.clue}';
+    });
+  }
+
+  void _toggleDirection() {
+    setState(() {
+      _direction = _direction == _CrosswordDirection.across
+          ? _CrosswordDirection.down
+          : _CrosswordDirection.across;
+      _message =
+          '${_activeEntry.number}${_direction == _CrosswordDirection.across ? 'A' : 'D'}: ${_activeEntry.clue}';
+    });
+  }
+
+  void _enterLetter(String letter) {
+    setState(() {
+      _checked = false;
+      _letters[_selected.row][_selected.column] = letter;
+      _moveForward();
+      if (_isSolved()) {
+        _message = 'Solved. Nice clean mini.';
+      }
+    });
+  }
+
+  void _moveForward() {
+    final entry = _activeEntry;
+    final cells = _cellsForEntry(entry);
+    final index = cells.indexOf(_selected);
+    if (index >= 0 && index < cells.length - 1) {
+      _selected = cells[index + 1];
+    }
+  }
+
+  void _moveBackward() {
+    final entry = _activeEntry;
+    final cells = _cellsForEntry(entry);
+    final index = cells.indexOf(_selected);
+    if (index > 0) {
+      _selected = cells[index - 1];
+    }
+  }
+
+  void _deleteLetter() {
+    setState(() {
+      _checked = false;
+      if (_letters[_selected.row][_selected.column].isNotEmpty) {
+        _letters[_selected.row][_selected.column] = '';
+      } else {
+        _moveBackward();
+        _letters[_selected.row][_selected.column] = '';
+      }
+    });
+  }
+
+  void _clearWord() {
+    final entry = _activeEntry;
+    final cells = _cellsForEntry(entry);
+    setState(() {
+      _checked = false;
+      for (final cell in cells) {
+        _letters[cell.row][cell.column] = '';
+      }
+      _selected = cells.first;
+      _message =
+          '${entry.number}${entry.direction == _CrosswordDirection.across ? 'A' : 'D'} cleared.';
+    });
+  }
+
+  void _revealWord() {
+    final entry = _activeEntry;
+    final cells = _cellsForEntry(entry);
+    setState(() {
+      _checked = true;
+      for (var i = 0; i < cells.length; i++) {
+        final cell = cells[i];
+        _letters[cell.row][cell.column] = entry.answer[i];
+      }
+      _message =
+          '${entry.number}${entry.direction == _CrosswordDirection.across ? 'A' : 'D'} revealed.';
+    });
+  }
+
+  double _completion() {
+    var filled = 0;
+    for (final row in _letters) {
+      for (final letter in row) {
+        if (letter.isNotEmpty) {
+          filled += 1;
+        }
+      }
+    }
+    return filled / 25;
+  }
+
+  Color _cellBackground(_GridPoint cell) {
+    if (_selected == cell) {
+      return const Color(0xFFFFD447);
+    }
+    if (_checked && _isCorrectCell(cell)) {
+      return WordieTheme.brandGreen.withValues(alpha: 0.35);
+    }
+    if (_cellInActiveEntry(cell)) {
+      return const Color(0xFF9ED7FF);
+    }
+    return Colors.white;
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    final activeEntry = _activeEntry;
+    final completion = _completion();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boardSize = math.min(constraints.maxWidth, 360.0);
+        final splitLayout = constraints.maxWidth >= 780;
+
+        final board = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F3E8),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF161616), width: 2),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${activeEntry.number}${_direction == _CrosswordDirection.across ? 'A' : 'D'}',
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(color: const Color(0xFF161616)),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              activeEntry.clue,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(color: const Color(0xFF161616)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      _MiniCrosswordMeta(
+                        label: 'Fill',
+                        value: '${(completion * 100).round()}%',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Center(
+                    child: SizedBox(
+                      width: boardSize,
+                      height: boardSize,
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 5,
+                            ),
+                        itemCount: 25,
+                        itemBuilder: (context, index) {
+                          final row = index ~/ 5;
+                          final column = index % 5;
+                          final cell = _GridPoint(row, column);
+                          final number = _cellNumbers['$row,$column'];
+                          return GestureDetector(
+                            onTap: () => _selectCell(cell, toggleIfSame: true),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _cellBackground(cell),
+                                border: Border.all(
+                                  color: const Color(0xFF161616),
+                                  width: 1.2,
+                                ),
+                              ),
+                              child: Stack(
+                                children: [
+                                  if (number != null)
+                                    Positioned(
+                                      left: 4,
+                                      top: 3,
+                                      child: Text(
+                                        '$number',
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF161616),
+                                        ),
+                                      ),
+                                    ),
+                                  Center(
+                                    child: Text(
+                                      _letters[row][column],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                            color: const Color(0xFF161616),
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _TinyButton(
+                  label: _direction == _CrosswordDirection.across
+                      ? 'Switch to Down'
+                      : 'Switch to Across',
+                  onPressed: _toggleDirection,
+                ),
+                _TinyButton(label: 'Clear Word', onPressed: _clearWord),
+                _TinyButton(label: 'Reveal Word', onPressed: _revealWord),
+                _TinyButton(label: 'Check', onPressed: _check),
+                _TinyButton(label: 'Reset', onPressed: _reset),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _MessageBar(message: _message),
+            const SizedBox(height: 12),
+            _CrosswordKeyboard(
+              onLetter: _enterLetter,
+              onBackspace: _deleteLetter,
+            ),
+          ],
+        );
+
+        final clues = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _ClueSection(
+              title: 'Across',
+              entries: _acrossEntries,
+              activeEntry: activeEntry,
+              entryFill: _entryFill,
+              entrySolved: _entrySolved,
+              onTap: _jumpToEntry,
+            ),
+            const SizedBox(height: 16),
+            _ClueSection(
+              title: 'Down',
+              entries: _downEntries,
+              activeEntry: activeEntry,
+              entryFill: _entryFill,
+              entrySolved: _entrySolved,
+              onTap: _jumpToEntry,
+            ),
+          ],
+        );
+
+        return SingleChildScrollView(
+          child: splitLayout
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 11, child: board),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 9, child: clues),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [board, const SizedBox(height: 16), clues],
+                ),
+        );
+      },
+    );
+  }
+}
+
+class _MiniCrosswordMeta extends StatelessWidget {
+  const _MiniCrosswordMeta({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161616),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _MessageBar(
-            message: _message,
-            trailing: _TinyButton(label: 'Clear', onPressed: _clear),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(color: Colors.white70),
           ),
-          const SizedBox(height: 16),
-          Center(
-            child: Column(
-              children: [
-                for (var row = 0; row < 4; row++)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var column = 0; column < 4; column++)
-                        Container(
-                          width: 54,
-                          height: 54,
-                          margin: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: _checked && _isCorrectCell(row, column)
-                                ? WordieTheme.brandGreen.withValues(alpha: 0.2)
-                                : WordieTheme.cardAlt,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: WordieTheme.border),
-                          ),
-                          child: TextField(
-                            controller: _controllers[row][column],
-                            textAlign: TextAlign.center,
-                            textCapitalization: TextCapitalization.characters,
-                            maxLength: 1,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              counterText: '',
-                            ),
-                            onChanged: (value) {
-                              final next = value.isEmpty
-                                  ? ''
-                                  : value[value.length - 1].toUpperCase();
-                              _controllers[row][column].value =
-                                  TextEditingValue(
-                                    text: next,
-                                    selection: TextSelection.collapsed(
-                                      offset: next.length,
-                                    ),
-                                  );
-                              if (_checked) {
-                                setState(() {});
-                              }
-                            },
-                          ),
-                        ),
-                    ],
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ClueSection extends StatelessWidget {
+  const _ClueSection({
+    required this.title,
+    required this.entries,
+    required this.activeEntry,
+    required this.entryFill,
+    required this.entrySolved,
+    required this.onTap,
+  });
+
+  final String title;
+  final List<_MiniCrosswordEntry> entries;
+  final _MiniCrosswordEntry activeEntry;
+  final String Function(_MiniCrosswordEntry entry) entryFill;
+  final bool Function(_MiniCrosswordEntry entry) entrySolved;
+  final void Function(_MiniCrosswordEntry entry) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 10),
+        for (final entry in entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () => onTap(entry),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: entry == activeEntry
+                      ? const Color(0xFF283F7F)
+                      : WordieTheme.cardAlt,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: entry == activeEntry
+                        ? const Color(0xFF9ED7FF)
+                        : WordieTheme.border,
                   ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '${entry.number}${entry.direction == _CrosswordDirection.across ? 'A' : 'D'}',
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        const Spacer(),
+                        if (entrySolved(entry))
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            size: 18,
+                            color: WordieTheme.brandGreen,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      entry.clue,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entryFill(entry),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: const Color(0xFF9ED7FF),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _CrosswordKeyboard extends StatelessWidget {
+  const _CrosswordKeyboard({required this.onLetter, required this.onBackspace});
+
+  final void Function(String letter) onLetter;
+  final VoidCallback onBackspace;
+
+  @override
+  Widget build(BuildContext context) {
+    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    return Column(
+      children: [
+        for (final row in rows)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (row == rows.last)
+                  _CrosswordKey(label: '⌫', flex: 12, onTap: onBackspace),
+                for (final letter in row.split(''))
+                  _CrosswordKey(label: letter, onTap: () => onLetter(letter)),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          _TinyButton(label: 'Check', onPressed: _check),
-          const SizedBox(height: 16),
-          Text('Across', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
-          for (final clue in _across)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(clue, style: Theme.of(context).textTheme.bodyMedium),
+      ],
+    );
+  }
+}
+
+class _CrosswordKey extends StatelessWidget {
+  const _CrosswordKey({
+    required this.label,
+    required this.onTap,
+    this.flex = 8,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final int flex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      flex: flex,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: SizedBox(
+          height: 46,
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: WordieTheme.cardAlt,
+              foregroundColor: WordieTheme.textPrimary,
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          const SizedBox(height: 12),
-          Text('Down', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
-          for (final clue in _down)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(clue, style: Theme.of(context).textTheme.bodyMedium),
-            ),
-        ],
+            onPressed: onTap,
+            child: Text(label),
+          ),
+        ),
       ),
     );
   }

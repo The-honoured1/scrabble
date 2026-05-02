@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class WordieTheme {
-  static const Color background = Color(0xFF121410);
-  static const Color card = Color(0xFF1B1E19);
-  static const Color cardAlt = Color(0xFF242821);
-  static const Color border = Color(0xFF32382E);
-  static const Color textPrimary = Color(0xFFF2F5EE);
-  static const Color textMuted = Color(0xFFAEB7A8);
-  static const Color brandGreen = Color(0xFF7CCB68);
+  static const Color background = Color(0xFF0B1020);
+  static const Color card = Color(0xFF141B34);
+  static const Color cardAlt = Color(0xFF202A4D);
+  static const Color border = Color(0xFF32406F);
+  static const Color textPrimary = Color(0xFFF7F9FF);
+  static const Color textMuted = Color(0xFFB5C0E0);
+  static const Color brandGreen = Color(0xFFB7F542);
 
   static ThemeData get theme {
     const base = TextTheme(

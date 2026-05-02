@@ -18,9 +18,9 @@ class FeaturedGameCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: WordieTheme.card,
+          color: game.color.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: WordieTheme.border),
+          border: Border.all(color: game.color.withValues(alpha: 0.7)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -38,12 +38,12 @@ class FeaturedGameCard extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   if (game.isCompletedToday && game.resultLabel != null)
                     _ResultChip(label: game.resultLabel!),
-                  if (game.isCompletedToday && game.resultLabel != null)
-                    const SizedBox(width: 8),
                   Text(
                     game.playLabel,
                     style: textTheme.labelLarge?.copyWith(color: game.color),
@@ -72,9 +72,9 @@ class CompactGameCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: WordieTheme.card,
+          color: game.color.withValues(alpha: 0.14),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: WordieTheme.border),
+          border: Border.all(color: game.color.withValues(alpha: 0.5)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18),
@@ -129,7 +129,7 @@ class _ModePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: game.color.withValues(alpha: 0.14),
+        color: game.color.withValues(alpha: 0.22),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -152,7 +152,7 @@ class _ResultChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: WordieTheme.cardAlt,
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(

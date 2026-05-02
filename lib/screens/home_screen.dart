@@ -33,48 +33,81 @@ class HomeScreen extends StatelessWidget {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
               sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            style: textTheme.headlineMedium,
-                            children: const [
-                              TextSpan(text: 'wordie'),
-                              TextSpan(
-                                text: '.',
-                                style: TextStyle(color: WordieTheme.brandGreen),
-                              ),
-                            ],
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final stackedHeader = constraints.maxWidth < 340;
+                    return Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: WordieTheme.cardAlt,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: WordieTheme.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (stackedHeader)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: textTheme.headlineMedium,
+                                    children: const [
+                                      TextSpan(text: 'wordie'),
+                                      TextSpan(
+                                        text: '.',
+                                        style: TextStyle(
+                                          color: WordieTheme.brandGreen,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                _StreakChip(
+                                  streakDays: streakDays,
+                                  textTheme: textTheme,
+                                ),
+                              ],
+                            )
+                          else
+                            Row(
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: textTheme.headlineMedium,
+                                    children: const [
+                                      TextSpan(text: 'wordie'),
+                                      TextSpan(
+                                        text: '.',
+                                        style: TextStyle(
+                                          color: WordieTheme.brandGreen,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(),
+                                _StreakChip(
+                                  streakDays: streakDays,
+                                  textTheme: textTheme,
+                                ),
+                              ],
+                            ),
+                          const SizedBox(height: 18),
+                          Text('Today\'s Games', style: textTheme.displaySmall),
+                          const SizedBox(height: 6),
+                          Text(date, style: textTheme.bodyMedium),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tap a game and play.',
+                            style: textTheme.bodyLarge,
                           ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: WordieTheme.card,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: WordieTheme.border),
-                          ),
-                          child: Text(
-                            '$streakDays day streak',
-                            style: textTheme.labelLarge,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    Text('Today\'s Games', style: textTheme.displaySmall),
-                    const SizedBox(height: 6),
-                    Text(date, style: textTheme.bodyMedium),
-                    const SizedBox(height: 8),
-                    Text('Tap a game and play.', style: textTheme.bodyLarge),
-                  ],
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -133,20 +166,44 @@ class HomeScreen extends StatelessWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final game = standardGames[index];
-                  return CompactGameCard(
-                    game: game,
-                    onTap: () => onGameSelected(context, game),
+              sliver: SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.crossAxisExtent;
+                  if (width <= 220) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final game = standardGames[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: SizedBox(
+                            height: 120,
+                            child: CompactGameCard(
+                              game: game,
+                              onTap: () => onGameSelected(context, game),
+                            ),
+                          ),
+                        );
+                      }, childCount: standardGames.length),
+                    );
+                  }
+
+                  final crossAxisCount = (width / 220).floor().clamp(1, 4);
+                  return SliverGrid(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final game = standardGames[index];
+                      return CompactGameCard(
+                        game: game,
+                        onTap: () => onGameSelected(context, game),
+                      );
+                    }, childCount: standardGames.length),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: width < 320 ? 1.4 : 1.15,
+                    ),
                   );
-                }, childCount: standardGames.length),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 260,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 1.15,
-                ),
+                },
               ),
             ),
             SliverPadding(
@@ -252,6 +309,28 @@ class _StatsBar extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _StreakChip extends StatelessWidget {
+  const _StreakChip({required this.streakDays, required this.textTheme});
+
+  final int streakDays;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: WordieTheme.brandGreen,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        '$streakDays day streak',
+        style: textTheme.labelLarge?.copyWith(color: WordieTheme.background),
       ),
     );
   }

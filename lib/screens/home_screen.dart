@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/wordie_game.dart';
 import '../theme/wordie_theme.dart';
 import '../widgets/game_card.dart';
-import '../widgets/mesh_background.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -27,174 +26,141 @@ class HomeScreen extends StatelessWidget {
     final date = _formatDate(DateTime.now());
 
     return Scaffold(
-      body: Stack(
-        children: [
-          const Positioned.fill(child: MeshBackground()),
-          SafeArea(
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  toolbarHeight: 78,
-                  backgroundColor: WordieTheme.background.withValues(
-                    alpha: 0.86,
-                  ),
-                  surfaceTintColor: Colors.transparent,
-                  titleSpacing: 24,
-                  title: Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: textTheme.headlineMedium?.copyWith(
-                            fontSize: 28,
-                          ),
-                          children: const [
-                            TextSpan(text: 'wordie'),
-                            TextSpan(
-                              text: '.',
-                              style: TextStyle(color: WordieTheme.brandGreen),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: WordieTheme.border),
-                        ),
-                        child: Text(
-                          '🔥 $streakDays days',
-                          style: textTheme.labelLarge,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 18),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Text(
-                          'Today\'s Games',
-                          style: textTheme.displaySmall?.copyWith(fontSize: 38),
+                        RichText(
+                          text: TextSpan(
+                            style: textTheme.headlineMedium,
+                            children: const [
+                              TextSpan(text: 'wordie'),
+                              TextSpan(
+                                text: '.',
+                                style: TextStyle(color: WordieTheme.brandGreen),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(date, style: textTheme.bodyLarge),
-                        const SizedBox(height: 24),
+                        const Spacer(),
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.04),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.06),
-                            ),
+                            color: WordieTheme.card,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: WordieTheme.border),
                           ),
                           child: Text(
-                            'Ten beloved word games, one editorial home. Daily ritual up top, replayable favorites below.',
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: WordieTheme.textPrimary.withValues(
-                                alpha: 0.88,
-                              ),
-                            ),
+                            '$streakDays day streak',
+                            style: textTheme.labelLarge,
                           ),
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 18),
+                    Text('Today\'s Games', style: textTheme.displaySmall),
+                    const SizedBox(height: 6),
+                    Text(date, style: textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Text('Tap a game and play.', style: textTheme.bodyLarge),
+                  ],
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  sliver: SliverToBoxAdapter(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isSingleColumn = constraints.maxWidth < 720;
-                        if (isSingleColumn) {
-                          return Column(
-                            children: featuredGames
-                                .map(
-                                  (game) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: SizedBox(
-                                      height: 260,
-                                      child: FeaturedGameCard(
-                                        game: game,
-                                        onTap: () =>
-                                            onGameSelected(context, game),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          );
-                        }
-
-                        return Row(
-                          children: [
-                            for (var i = 0; i < featuredGames.length; i++) ...[
-                              Expanded(
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              sliver: SliverToBoxAdapter(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final stacked = constraints.maxWidth < 760;
+                    if (stacked) {
+                      return Column(
+                        children: featuredGames
+                            .map(
+                              (game) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
                                 child: SizedBox(
-                                  height: 280,
+                                  height: 150,
                                   child: FeaturedGameCard(
-                                    game: featuredGames[i],
-                                    onTap: () => onGameSelected(
-                                      context,
-                                      featuredGames[i],
-                                    ),
+                                    game: game,
+                                    onTap: () => onGameSelected(context, game),
                                   ),
                                 ),
                               ),
-                              if (i < featuredGames.length - 1)
-                                const SizedBox(width: 16),
-                            ],
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-                  sliver: SliverGrid(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final game = standardGames[index];
-                      return CompactGameCard(
-                        game: game,
-                        onTap: () => onGameSelected(context, game),
+                            )
+                            .toList(),
                       );
-                    }, childCount: standardGames.length),
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 260,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: 0.86,
-                        ),
-                  ),
+                    }
+
+                    return Row(
+                      children: [
+                        for (var i = 0; i < featuredGames.length; i++) ...[
+                          Expanded(
+                            child: SizedBox(
+                              height: 150,
+                              child: FeaturedGameCard(
+                                game: featuredGames[i],
+                                onTap: () =>
+                                    onGameSelected(context, featuredGames[i]),
+                              ),
+                            ),
+                          ),
+                          if (i < featuredGames.length - 1)
+                            const SizedBox(width: 12),
+                        ],
+                      ],
+                    );
+                  },
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                  sliver: SliverToBoxAdapter(
-                    child: _StatsBar(
-                      totalGames: games.length,
-                      streakDays: streakDays,
-                      completedToday: completedToday,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+              sliver: SliverToBoxAdapter(
+                child: Text('More Games', style: textTheme.headlineSmall),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final game = standardGames[index];
+                  return CompactGameCard(
+                    game: game,
+                    onTap: () => onGameSelected(context, game),
+                  );
+                }, childCount: standardGames.length),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 260,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.15,
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+              sliver: SliverToBoxAdapter(
+                child: _StatsBar(
+                  totalGames: games.length,
+                  streakDays: streakDays,
+                  completedToday: completedToday,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -242,10 +208,10 @@ class _StatsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(26),
+        color: WordieTheme.card,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: WordieTheme.border),
       ),
       child: LayoutBuilder(

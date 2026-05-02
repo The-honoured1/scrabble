@@ -1,3 +1,14 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Flutter generated folders
+.dart_tool/
+build/
+
+# Flutter plugin metadata
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE noise
+.idea/

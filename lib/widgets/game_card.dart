@@ -18,46 +18,36 @@ class FeaturedGameCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: WordieTheme.card.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(30),
+          color: WordieTheme.card,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: WordieTheme.border),
-          boxShadow: [
-            BoxShadow(
-              color: game.color.withValues(alpha: 0.16),
-              blurRadius: 28,
-              spreadRadius: -12,
-              offset: const Offset(0, 18),
-            ),
-          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _AccentBar(color: game.color),
-              const SizedBox(height: 18),
               Row(
                 children: [
-                  Text(game.emoji, style: const TextStyle(fontSize: 28)),
-                  const Spacer(),
+                  Text(game.emoji, style: const TextStyle(fontSize: 26)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(game.title, style: textTheme.headlineSmall),
+                  ),
                   _ModePill(game: game),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(game.title, style: textTheme.headlineSmall),
-              const SizedBox(height: 8),
-              Text(game.description, style: textTheme.bodyMedium),
               const Spacer(),
               Row(
                 children: [
-                  Text(
-                    '${game.playLabel} →',
-                    style: textTheme.labelLarge?.copyWith(color: game.color),
-                  ),
-                  const Spacer(),
                   if (game.isCompletedToday && game.resultLabel != null)
                     _ResultChip(label: game.resultLabel!),
+                  if (game.isCompletedToday && game.resultLabel != null)
+                    const SizedBox(width: 8),
+                  Text(
+                    game.playLabel,
+                    style: textTheme.labelLarge?.copyWith(color: game.color),
+                  ),
                 ],
               ),
             ],
@@ -82,22 +72,22 @@ class CompactGameCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: WordieTheme.card.withValues(alpha: 0.92),
-          borderRadius: BorderRadius.circular(24),
+          color: WordieTheme.card,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: WordieTheme.border),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+          padding: const EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _AccentBar(color: game.color),
-              const SizedBox(height: 16),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(game.emoji, style: const TextStyle(fontSize: 24)),
-                  const Spacer(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(game.title, style: textTheme.titleLarge),
+                  ),
                   if (game.isCompletedToday)
                     Icon(
                       Icons.check_circle_rounded,
@@ -106,38 +96,25 @@ class CompactGameCard extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 14),
-              Text(game.title, style: textTheme.titleLarge),
-              const SizedBox(height: 6),
-              Text(
-                game.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.bodyMedium,
-              ),
               const Spacer(),
-              Text(
-                game.modeLabel,
-                style: textTheme.labelMedium?.copyWith(color: game.color),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    game.modeLabel,
+                    style: textTheme.labelMedium?.copyWith(color: game.color),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    game.playLabel,
+                    style: textTheme.labelLarge?.copyWith(color: game.color),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AccentBar extends StatelessWidget {
-  const _AccentBar({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(999)),
-      child: Container(height: 3, color: color),
     );
   }
 }
@@ -152,9 +129,8 @@ class _ModePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: game.color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: game.color.withValues(alpha: 0.35)),
+        color: game.color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         game.mode == WordieMode.daily ? 'Daily' : 'Unlimited',
@@ -176,8 +152,8 @@ class _ResultChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(999),
+        color: WordieTheme.cardAlt,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         label,

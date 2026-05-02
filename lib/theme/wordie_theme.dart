@@ -1,68 +1,51 @@
 import 'package:flutter/material.dart';
 
 class WordieTheme {
-  static const Color background = Color(0xFF1A1A18);
-  static const Color card = Color(0xFF242420);
-  static const Color cardAlt = Color(0xFF2D2D28);
-  static const Color border = Color(0xFF3C3B34);
-  static const Color textPrimary = Color(0xFFF5F1E8);
-  static const Color textMuted = Color(0xFFB7B2A8);
-  static const Color brandGreen = Color(0xFF52B788);
+  static const Color background = Color(0xFF121410);
+  static const Color card = Color(0xFF1B1E19);
+  static const Color cardAlt = Color(0xFF242821);
+  static const Color border = Color(0xFF32382E);
+  static const Color textPrimary = Color(0xFFF2F5EE);
+  static const Color textMuted = Color(0xFFAEB7A8);
+  static const Color brandGreen = Color(0xFF7CCB68);
 
   static ThemeData get theme {
     const base = TextTheme(
       displaySmall: TextStyle(
-        fontFamily: 'Playfair Display',
-        fontSize: 42,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -1.2,
+        fontSize: 34,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.8,
         color: textPrimary,
       ),
       headlineMedium: TextStyle(
-        fontFamily: 'Playfair Display',
-        fontSize: 30,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.6,
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.4,
         color: textPrimary,
       ),
       headlineSmall: TextStyle(
-        fontFamily: 'Playfair Display',
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: textPrimary,
       ),
       titleLarge: TextStyle(
-        fontFamily: 'Playfair Display',
         fontSize: 20,
         fontWeight: FontWeight.w700,
         color: textPrimary,
       ),
       titleMedium: TextStyle(
-        fontFamily: 'DM Sans',
         fontSize: 16,
         fontWeight: FontWeight.w700,
         color: textPrimary,
       ),
-      bodyLarge: TextStyle(
-        fontFamily: 'DM Sans',
-        fontSize: 16,
-        height: 1.45,
-        color: textPrimary,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: 'DM Sans',
-        fontSize: 14,
-        height: 1.45,
-        color: textMuted,
-      ),
+      bodyLarge: TextStyle(fontSize: 16, height: 1.45, color: textPrimary),
+      bodyMedium: TextStyle(fontSize: 14, height: 1.45, color: textMuted),
       labelLarge: TextStyle(
-        fontFamily: 'DM Sans',
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: textPrimary,
       ),
       labelMedium: TextStyle(
-        fontFamily: 'DM Sans',
         fontSize: 12,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.2,
@@ -90,9 +73,8 @@ class WordieTheme {
       textTheme: base,
       cardTheme: CardThemeData(
         color: card,
-        shadowColor: Colors.black.withValues(alpha: 0.35),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(18),
           side: const BorderSide(color: border),
         ),
       ),

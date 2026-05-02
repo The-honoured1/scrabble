@@ -8,9 +8,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.text('Today\'s Games'), findsOneWidget);
-    expect(find.textContaining('days'), findsOneWidget);
+    expect(find.textContaining('streak'), findsOneWidget);
     expect(find.text('Wordle'), findsOneWidget);
     expect(find.text('Connections'), findsOneWidget);
-    expect(find.textContaining('Ten beloved word games'), findsOneWidget);
+    expect(find.text('Tap a game and play.'), findsOneWidget);
   });
 }

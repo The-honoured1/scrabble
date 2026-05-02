@@ -37,14 +37,18 @@ class HomeScreen extends StatelessWidget {
                 SliverAppBar(
                   pinned: true,
                   toolbarHeight: 78,
-                  backgroundColor: WordieTheme.background.withValues(alpha: 0.86),
+                  backgroundColor: WordieTheme.background.withValues(
+                    alpha: 0.86,
+                  ),
                   surfaceTintColor: Colors.transparent,
                   titleSpacing: 24,
                   title: Row(
                     children: [
                       RichText(
                         text: TextSpan(
-                          style: textTheme.headlineMedium?.copyWith(fontSize: 28),
+                          style: textTheme.headlineMedium?.copyWith(
+                            fontSize: 28,
+                          ),
                           children: const [
                             TextSpan(text: 'wordie'),
                             TextSpan(
@@ -98,7 +102,9 @@ class HomeScreen extends StatelessWidget {
                           child: Text(
                             'Ten beloved word games, one editorial home. Daily ritual up top, replayable favorites below.',
                             style: textTheme.bodyLarge?.copyWith(
-                              color: WordieTheme.textPrimary.withValues(alpha: 0.88),
+                              color: WordieTheme.textPrimary.withValues(
+                                alpha: 0.88,
+                              ),
                             ),
                           ),
                         ),
@@ -122,7 +128,8 @@ class HomeScreen extends StatelessWidget {
                                       height: 260,
                                       child: FeaturedGameCard(
                                         game: game,
-                                        onTap: () => onGameSelected(context, game),
+                                        onTap: () =>
+                                            onGameSelected(context, game),
                                       ),
                                     ),
                                   ),
@@ -139,8 +146,10 @@ class HomeScreen extends StatelessWidget {
                                   height: 280,
                                   child: FeaturedGameCard(
                                     game: featuredGames[i],
-                                    onTap: () =>
-                                        onGameSelected(context, featuredGames[i]),
+                                    onTap: () => onGameSelected(
+                                      context,
+                                      featuredGames[i],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -156,22 +165,20 @@ class HomeScreen extends StatelessWidget {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
                   sliver: SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final game = standardGames[index];
-                        return CompactGameCard(
-                          game: game,
-                          onTap: () => onGameSelected(context, game),
-                        );
-                      },
-                      childCount: standardGames.length,
-                    ),
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 260,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.86,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final game = standardGames[index];
+                      return CompactGameCard(
+                        game: game,
+                        onTap: () => onGameSelected(context, game),
+                      );
+                    }, childCount: standardGames.length),
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 260,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 0.86,
+                        ),
                   ),
                 ),
                 SliverPadding(
@@ -249,7 +256,10 @@ class _StatsBar extends StatelessWidget {
           final children = [
             _StatItem(label: 'Total games', value: '$totalGames'),
             _StatItem(label: 'Current streak', value: '$streakDays'),
-            _StatItem(label: 'Completed today', value: '$completedToday/$totalGames'),
+            _StatItem(
+              label: 'Completed today',
+              value: '$completedToday/$totalGames',
+            ),
           ];
 
           if (compact) {
@@ -284,10 +294,7 @@ class _StatsBar extends StatelessWidget {
 }
 
 class _StatItem extends StatelessWidget {
-  const _StatItem({
-    required this.label,
-    required this.value,
-  });
+  const _StatItem({required this.label, required this.value});
 
   final String label;
   final String value;

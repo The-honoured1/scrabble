@@ -7,11 +7,7 @@ import '../theme/wordie_theme.dart';
 import '../widgets/mesh_background.dart';
 
 class GameScreen extends StatelessWidget {
-  const GameScreen({
-    required this.game,
-    required this.totalGames,
-    super.key,
-  });
+  const GameScreen({required this.game, required this.totalGames, super.key});
 
   final WordieGame game;
   final int totalGames;
@@ -53,10 +49,7 @@ class GameScreen extends StatelessWidget {
                         onTap: () => Navigator.of(context).pop(),
                       ),
                       const Spacer(),
-                      _TopButton(
-                        icon: Icons.ios_share_rounded,
-                        onTap: () {},
-                      ),
+                      _TopButton(icon: Icons.ios_share_rounded, onTap: () {}),
                     ],
                   ),
                   const SizedBox(height: 22),
@@ -100,10 +93,7 @@ class GameScreen extends StatelessWidget {
                   Text('Why it feels good', style: textTheme.headlineSmall),
                   const SizedBox(height: 14),
                   for (final highlight in game.highlights) ...[
-                    _HighlightRow(
-                      color: game.color,
-                      text: highlight,
-                    ),
+                    _HighlightRow(color: game.color, text: highlight),
                     const SizedBox(height: 12),
                   ],
                   const SizedBox(height: 24),
@@ -154,10 +144,7 @@ class GameScreen extends StatelessWidget {
 }
 
 class _TopButton extends StatelessWidget {
-  const _TopButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _TopButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -177,10 +164,7 @@ class _TopButton extends StatelessWidget {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.label,
-    required this.color,
-  });
+  const _Badge({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -199,18 +183,15 @@ class _Badge extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: color == Colors.white ? WordieTheme.textPrimary : color,
-            ),
+          color: color == Colors.white ? WordieTheme.textPrimary : color,
+        ),
       ),
     );
   }
 }
 
 class _HighlightRow extends StatelessWidget {
-  const _HighlightRow({
-    required this.color,
-    required this.text,
-  });
+  const _HighlightRow({required this.color, required this.text});
 
   final Color color;
   final String text;
@@ -228,19 +209,13 @@ class _HighlightRow extends StatelessWidget {
             shape: BoxShape.circle,
             color: color,
             boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.4),
-                blurRadius: 14,
-              ),
+              BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 14),
             ],
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          child: Text(text, style: Theme.of(context).textTheme.bodyLarge),
         ),
       ],
     );
@@ -476,9 +451,9 @@ class _HexLetter extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             letter,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: textColor,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: textColor),
           ),
         ),
       ),
@@ -514,7 +489,9 @@ class _CrosswordPreview extends StatelessWidget {
                   margin: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: cells[row][col] == 1
-                        ? Colors.white.withValues(alpha: row == 1 && col < 4 ? 0.16 : 0.08)
+                        ? Colors.white.withValues(
+                            alpha: row == 1 && col < 4 ? 0.16 : 0.08,
+                          )
                         : Colors.black.withValues(alpha: 0.42),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
@@ -582,9 +559,9 @@ class _HangmanPreview extends StatelessWidget {
             children: [
               Text(
                 'Category: Animal',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: color,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: color),
               ),
               const SizedBox(height: 14),
               Text(
@@ -617,9 +594,7 @@ class _HangmanPreview extends StatelessWidget {
         SizedBox(
           width: 90,
           height: 120,
-          child: CustomPaint(
-            painter: _HangmanPainter(color: color),
-          ),
+          child: CustomPaint(painter: _HangmanPainter(color: color)),
         ),
       ],
     );
@@ -641,7 +616,12 @@ class _BogglePreview extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: rows[r].split(' ').map((letter) {
-              final active = (r == 0 || r == 1) && (letter == 'S' || letter == 'T' || letter == 'A' || letter == 'R');
+              final active =
+                  (r == 0 || r == 1) &&
+                  (letter == 'S' ||
+                      letter == 'T' ||
+                      letter == 'A' ||
+                      letter == 'R');
               return Container(
                 width: 46,
                 height: 46,
@@ -718,7 +698,10 @@ class _TypeRacerPreview extends StatelessWidget {
                 text: 'Quick',
                 style: TextStyle(color: color, fontWeight: FontWeight.w700),
               ),
-              const TextSpan(text: ' words sharpen the mind and steady the hands for faster rounds.'),
+              const TextSpan(
+                text:
+                    ' words sharpen the mind and steady the hands for faster rounds.',
+              ),
             ],
           ),
         ),
@@ -736,10 +719,7 @@ class _TypeRacerPreview extends StatelessWidget {
 }
 
 class _MetricChip extends StatelessWidget {
-  const _MetricChip({
-    required this.label,
-    required this.color,
-  });
+  const _MetricChip({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -755,8 +735,8 @@ class _MetricChip extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: color == Colors.white ? WordieTheme.textPrimary : color,
-            ),
+          color: color == Colors.white ? WordieTheme.textPrimary : color,
+        ),
       ),
     );
   }
@@ -802,7 +782,9 @@ class _AnagramPreview extends StatelessWidget {
               Expanded(
                 child: Container(
                   height: 52,
-                  margin: EdgeInsets.only(right: i == letters.length - 1 ? 0 : 10),
+                  margin: EdgeInsets.only(
+                    right: i == letters.length - 1 ? 0 : 10,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: color.withValues(alpha: 0.35)),

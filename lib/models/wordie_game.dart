@@ -43,7 +43,7 @@ class WordieGame {
   final bool isCompletedToday;
 
   String get modeLabel => switch (mode) {
-        WordieMode.daily => 'Daily puzzle',
-        WordieMode.unlimited => 'Unlimited play',
-      };
+    WordieMode.daily => 'Daily puzzle',
+    WordieMode.unlimited => 'Unlimited play',
+  };
 }

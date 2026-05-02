@@ -70,16 +70,17 @@ class WordieTheme {
       ),
     );
 
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: brandGreen,
-      brightness: Brightness.dark,
-    ).copyWith(
-      surface: card,
-      surfaceContainerHighest: cardAlt,
-      primary: brandGreen,
-      onPrimary: background,
-      onSurface: textPrimary,
-    );
+    final colorScheme =
+        ColorScheme.fromSeed(
+          seedColor: brandGreen,
+          brightness: Brightness.dark,
+        ).copyWith(
+          surface: card,
+          surfaceContainerHighest: cardAlt,
+          primary: brandGreen,
+          onPrimary: background,
+          onSurface: textPrimary,
+        );
 
     return ThemeData(
       useMaterial3: true,

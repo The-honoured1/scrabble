@@ -20,12 +20,7 @@ class WordieApp extends StatelessWidget {
         streakDays: 5,
         completedToday: 3,
         onGameSelected: (context, game) => Navigator.of(context).push(
-          _fadeRoute(
-            GameScreen(
-              game: game,
-              totalGames: wordieGames.length,
-            ),
-          ),
+          _fadeRoute(GameScreen(game: game, totalGames: wordieGames.length)),
         ),
       ),
     );
@@ -43,10 +38,7 @@ class WordieApp extends StatelessWidget {
           reverseCurve: Curves.easeInCubic,
         );
 
-        return FadeTransition(
-          opacity: curved,
-          child: child,
-        );
+        return FadeTransition(opacity: curved, child: child);
       },
     );
   }

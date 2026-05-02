@@ -57,7 +57,8 @@ const List<WordieGame> wordieGames = [
     id: WordieGameId.miniCrossword,
     title: 'Mini Crossword',
     emoji: '🧩',
-    description: 'A quick 5x5 crossword with sharp clues and smooth cursor flow.',
+    description:
+        'A quick 5x5 crossword with sharp clues and smooth cursor flow.',
     color: Color(0xFF4A7FBF),
     mode: WordieMode.daily,
     playLabel: 'Solve clues',
@@ -99,7 +100,8 @@ const List<WordieGame> wordieGames = [
     id: WordieGameId.boggle,
     title: 'Boggle',
     emoji: '🔠',
-    description: 'Swipe adjacent letters into words before the 90-second clock ends.',
+    description:
+        'Swipe adjacent letters into words before the 90-second clock ends.',
     color: Color(0xFFE9A84C),
     mode: WordieMode.unlimited,
     playLabel: 'Race the clock',

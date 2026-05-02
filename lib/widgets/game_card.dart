@@ -5,11 +5,7 @@ import '../theme/wordie_theme.dart';
 import 'pressable_scale.dart';
 
 class FeaturedGameCard extends StatelessWidget {
-  const FeaturedGameCard({
-    required this.game,
-    required this.onTap,
-    super.key,
-  });
+  const FeaturedGameCard({required this.game, required this.onTap, super.key});
 
   final WordieGame game;
   final VoidCallback onTap;
@@ -43,10 +39,7 @@ class FeaturedGameCard extends StatelessWidget {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  Text(
-                    game.emoji,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  Text(game.emoji, style: const TextStyle(fontSize: 28)),
                   const Spacer(),
                   _ModePill(game: game),
                 ],
@@ -76,11 +69,7 @@ class FeaturedGameCard extends StatelessWidget {
 }
 
 class CompactGameCard extends StatelessWidget {
-  const CompactGameCard({
-    required this.game,
-    required this.onTap,
-    super.key,
-  });
+  const CompactGameCard({required this.game, required this.onTap, super.key});
 
   final WordieGame game;
   final VoidCallback onTap;
@@ -148,10 +137,7 @@ class _AccentBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(999)),
-      child: Container(
-        height: 3,
-        color: color,
-      ),
+      child: Container(height: 3, color: color),
     );
   }
 }
@@ -172,9 +158,9 @@ class _ModePill extends StatelessWidget {
       ),
       child: Text(
         game.mode == WordieMode.daily ? 'Daily' : 'Unlimited',
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: game.color,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelMedium?.copyWith(color: game.color),
       ),
     );
   }
@@ -195,9 +181,9 @@ class _ResultChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: WordieTheme.textPrimary,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelMedium?.copyWith(color: WordieTheme.textPrimary),
       ),
     );
   }

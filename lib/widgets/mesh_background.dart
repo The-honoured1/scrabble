@@ -29,9 +29,7 @@ class _MeshBackgroundState extends State<MeshBackground>
       builder: (context, child) {
         final t = _controller.value;
         return DecoratedBox(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1A1A18),
-          ),
+          decoration: const BoxDecoration(color: Color(0xFF1A1A18)),
           child: Stack(
             fit: StackFit.expand,
             children: [

@@ -2,11 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class PressableScale extends StatefulWidget {
-  const PressableScale({
-    required this.child,
-    required this.onTap,
-    super.key,
-  });
+  const PressableScale({required this.child, required this.onTap, super.key});
 
   final Widget child;
   final VoidCallback onTap;

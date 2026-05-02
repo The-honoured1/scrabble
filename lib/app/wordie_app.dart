@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../data/game_catalog.dart';
-import '../models/wordie_game.dart';
 import '../screens/game_screen.dart';
 import '../screens/home_screen.dart';
 import '../theme/wordie_theme.dart';

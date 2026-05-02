@@ -12,7 +12,6 @@ var title_label: Label
 var desc_label: Label
 var emoji_label: Label
 var accent_bar: ColorRect
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	flat = true
@@ -61,24 +60,24 @@ func _build_ui() -> void:
 
 	title_label = Label.new()
 	title_label.text = game_title
-	title_label.modulate = theme.TEXT_PRIMARY
+	title_label.modulate = AppTheme.TEXT_PRIMARY
 	title_label.add_theme_font_size_override("font_size", 14)
-	if theme.sans_medium:
-		title_label.add_theme_font_override("font", theme.sans_medium)
+	if AppTheme.sans_medium:
+		title_label.add_theme_font_override("font", AppTheme.sans_medium)
 	vb.add_child(title_label)
 
 	desc_label = Label.new()
 	desc_label.text = game_desc
-	desc_label.modulate = theme.TEXT_MUTED
+	desc_label.modulate = AppTheme.TEXT_MUTED
 	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc_label.add_theme_font_size_override("font_size", 11)
-	if theme.sans_regular:
-		desc_label.add_theme_font_override("font", theme.sans_regular)
+	if AppTheme.sans_regular:
+		desc_label.add_theme_font_override("font", AppTheme.sans_regular)
 	vb.add_child(desc_label)
 
 func _update_style() -> void:
-	var normal := theme.style_card(theme.BG_CARD)
-	var press := theme.style_card(theme.BG_SURFACE)
+	var normal: StyleBoxFlat = AppTheme.style_card(AppTheme.BG_CARD)
+	var press: StyleBoxFlat = AppTheme.style_card(AppTheme.BG_SURFACE)
 	add_theme_stylebox_override("normal", normal)
 	add_theme_stylebox_override("hover", normal)
 	add_theme_stylebox_override("pressed", press)

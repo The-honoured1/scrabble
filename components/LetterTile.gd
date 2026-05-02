@@ -7,7 +7,6 @@ var letter := ""
 var label: Label
 var glow_mat: ShaderMaterial
 var base_pos := Vector2.ZERO
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	base_pos = position
@@ -16,9 +15,9 @@ func _ready() -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 28)
-	if theme.sans_medium:
-		label.add_theme_font_override("font", theme.sans_medium)
-	label.modulate = theme.TEXT_PRIMARY
+	if AppTheme.sans_medium:
+		label.add_theme_font_override("font", AppTheme.sans_medium)
+	label.modulate = AppTheme.TEXT_PRIMARY
 	add_child(label)
 	label.anchor_right = 1.0
 	label.anchor_bottom = 1.0
@@ -68,19 +67,19 @@ func pop_anim() -> void:
 	t.tween_property(self, "scale", Vector2.ONE, 0.05)
 
 func _update_style() -> void:
-	var sb := theme.style_card(theme.TILE_EMPTY)
+	var sb := AppTheme.style_card(AppTheme.TILE_EMPTY)
 	match state:
 		TileState.EMPTY:
-			sb.bg_color = theme.TILE_EMPTY
+			sb.bg_color = AppTheme.TILE_EMPTY
 		TileState.FILLED:
-			sb.bg_color = theme.BG_SURFACE
+			sb.bg_color = AppTheme.BG_SURFACE
 		TileState.CORRECT:
-			sb.bg_color = theme.TILE_CORRECT
+			sb.bg_color = AppTheme.TILE_CORRECT
 		TileState.PRESENT:
-			sb.bg_color = theme.TILE_PRESENT
+			sb.bg_color = AppTheme.TILE_PRESENT
 		TileState.ABSENT:
-			sb.bg_color = theme.TILE_ABSENT
+			sb.bg_color = AppTheme.TILE_ABSENT
 		TileState.REVEALED:
-			sb.bg_color = theme.ACCENT_NAVY
+			sb.bg_color = AppTheme.ACCENT_NAVY
 	add_theme_stylebox_override("panel", sb)
 	material = glow_mat if state == TileState.CORRECT else null

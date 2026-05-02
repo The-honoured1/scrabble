@@ -7,14 +7,13 @@ var title_label: Label
 var body_label: Label
 var ok_btn: Button
 var close_btn: Button
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	anchor_left = 0.08
 	anchor_top = 0.3
 	anchor_right = 0.92
 	anchor_bottom = 0.7
-	add_theme_stylebox_override("panel", theme.style_card(theme.BG_CARD))
+	add_theme_stylebox_override("panel", AppTheme.style_card(AppTheme.BG_CARD))
 	var root := MarginContainer.new()
 	root.anchor_right = 1.0
 	root.anchor_bottom = 1.0
@@ -30,14 +29,14 @@ func _ready() -> void:
 
 	title_label = Label.new()
 	title_label.add_theme_font_size_override("font_size", 24)
-	title_label.modulate = theme.TEXT_PRIMARY
-	if theme.display_font:
-		title_label.add_theme_font_override("font", theme.display_font)
+	title_label.modulate = AppTheme.TEXT_PRIMARY
+	if AppTheme.display_font:
+		title_label.add_theme_font_override("font", AppTheme.display_font)
 	vb.add_child(title_label)
 
 	body_label = Label.new()
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body_label.modulate = theme.TEXT_MUTED
+	body_label.modulate = AppTheme.TEXT_MUTED
 	vb.add_child(body_label)
 
 	var actions := HBoxContainer.new()

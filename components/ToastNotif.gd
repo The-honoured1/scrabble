@@ -1,5 +1,4 @@
 extends Label
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	anchor_left = 0.2
@@ -9,8 +8,8 @@ func _ready() -> void:
 	horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	add_theme_font_size_override("font_size", 13)
-	modulate = theme.TEXT_PRIMARY
-	var sb := theme.style_card(theme.BG_SURFACE)
+	modulate = AppTheme.TEXT_PRIMARY
+	var sb := AppTheme.style_card(AppTheme.BG_SURFACE)
 	add_theme_stylebox_override("normal", sb)
 
 func show_toast(msg: String, duration := 1.2) -> void:

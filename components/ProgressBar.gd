@@ -13,7 +13,6 @@ func set_progress(v: float, m: float = max_value) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var theme: Variant = get_node("/root/AppTheme")
-	draw_rect(Rect2(Vector2.ZERO, size), theme.BORDER, true)
+	draw_rect(Rect2(Vector2.ZERO, size), AppTheme.BORDER, true)
 	var pct := clamp(value / max_value, 0.0, 1.0)
 	draw_rect(Rect2(Vector2.ZERO, Vector2(size.x * pct, size.y)), fill_color, true)

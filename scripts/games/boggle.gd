@@ -17,7 +17,6 @@ var timer_label: Label
 var word_label: Label
 var toast
 var dialog
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	_generate_grid()
@@ -40,7 +39,7 @@ func _generate_grid() -> void:
 		grid_letters.append(row)
 
 func _build_ui() -> void:
-	var bg := ColorRect.new(); bg.color = theme.BG_DARK; bg.anchor_right = 1.0; bg.anchor_bottom = 1.0; add_child(bg)
+	var bg := ColorRect.new(); bg.color = AppTheme.BG_DARK; bg.anchor_right = 1.0; bg.anchor_bottom = 1.0; add_child(bg)
 	var root := VBoxContainer.new(); root.anchor_right = 1.0; root.anchor_bottom = 1.0; root.add_theme_constant_override("separation", 8); add_child(root)
 	root.add_child(_top_bar("Boggle"))
 	timer_label = Label.new(); root.add_child(timer_label)
@@ -84,7 +83,7 @@ func _pick(p: Vector2i) -> void:
 		toast.show_toast("Must be adjacent")
 		return
 	selected.append(p)
-	grid_buttons[p.x][p.y].add_theme_stylebox_override("normal", theme.style_card(theme.ACCENT_AMBER))
+	grid_buttons[p.x][p.y].add_theme_stylebox_override("normal", AppTheme.style_card(AppTheme.ACCENT_AMBER))
 	_refresh_word()
 
 func _submit_word() -> void:
@@ -109,7 +108,7 @@ func _submit_word() -> void:
 
 func _clear_selection(reset_word := true) -> void:
 	for p in selected:
-		grid_buttons[p.x][p.y].add_theme_stylebox_override("normal", theme.style_card(theme.BG_SURFACE))
+		grid_buttons[p.x][p.y].add_theme_stylebox_override("normal", AppTheme.style_card(AppTheme.BG_SURFACE))
 	selected.clear()
 	if reset_word:
 		word_label.text = ""

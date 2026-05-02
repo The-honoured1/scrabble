@@ -10,7 +10,6 @@ var source_buttons: Array[Button] = []
 var dialog
 var toast
 var clue_label: Label
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	var txt := FileAccess.get_file_as_string("res://assets/puzzles/anagram.json")
@@ -19,7 +18,7 @@ func _ready() -> void:
 	_build_ui()
 
 func _build_ui() -> void:
-	var bg := ColorRect.new(); bg.color = theme.BG_DARK; bg.anchor_right = 1.0; bg.anchor_bottom = 1.0; add_child(bg)
+	var bg := ColorRect.new(); bg.color = AppTheme.BG_DARK; bg.anchor_right = 1.0; bg.anchor_bottom = 1.0; add_child(bg)
 	var root := VBoxContainer.new(); root.anchor_right = 1.0; root.anchor_bottom = 1.0; root.add_theme_constant_override("separation", 10); add_child(root)
 	root.add_child(_top_bar("Anagram"))
 	clue_label = Label.new(); clue_label.text = "Clue: %s" % puzzle.clue; root.add_child(clue_label)
@@ -104,7 +103,7 @@ func _check() -> void:
 		return
 	if built == puzzle.word:
 		for s in answer_slots:
-			s.add_theme_stylebox_override("normal", theme.style_card(theme.ACCENT_GREEN))
+			s.add_theme_stylebox_override("normal", AppTheme.style_card(AppTheme.ACCENT_GREEN))
 		GameManager.mark_complete("anagram")
 		dialog.show_result("Solved!", "Correct: %s" % puzzle.word, "Home")
 		dialog.confirmed.connect(func() -> void: SceneManager.go_to("res://scenes/Home.tscn"), CONNECT_ONE_SHOT)

@@ -7,7 +7,6 @@ const ROWS := ["QWERTYUIOP", "ASDFGHJKL", "DELZXCVBNMENTER"]
 var key_buttons: Dictionary = {}
 var state_priority := {"DEFAULT": 0, "ABSENT": 1, "PRESENT": 2, "CORRECT": 3}
 var key_states: Dictionary = {}
-@onready var theme: Variant = get_node("/root/AppTheme")
 
 func _ready() -> void:
 	_build()
@@ -52,18 +51,18 @@ func _build() -> void:
 			key_states[key] = "DEFAULT"
 
 func _style_key(button: Button, state_name: String) -> void:
-	var c := theme.BG_SURFACE
+	var c := AppTheme.BG_SURFACE
 	if state_name == "CORRECT":
-		c = theme.ACCENT_GREEN
+		c = AppTheme.ACCENT_GREEN
 	elif state_name == "PRESENT":
-		c = theme.ACCENT_AMBER
+		c = AppTheme.ACCENT_AMBER
 	elif state_name == "ABSENT":
-		c = theme.TILE_ABSENT
-	var sb := theme.style_card(c)
+		c = AppTheme.TILE_ABSENT
+	var sb := AppTheme.style_card(c)
 	button.add_theme_stylebox_override("normal", sb)
-	button.add_theme_stylebox_override("pressed", theme.style_card(c.darkened(0.1)))
+	button.add_theme_stylebox_override("pressed", AppTheme.style_card(c.darkened(0.1)))
 	button.add_theme_stylebox_override("hover", sb)
-	button.modulate = theme.TEXT_PRIMARY
+	button.modulate = AppTheme.TEXT_PRIMARY
 
 func set_key_state(key: String, state_name: String) -> void:
 	key = key.to_upper()
